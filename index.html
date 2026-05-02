@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -14,6 +14,8 @@
       --line: #d5d5d5;
       --line-strong: #111111;
       --radius: 12px;
+      --ok: #0c6a36;
+      --warn: #8a1111;
     }
 
     * {
@@ -48,6 +50,8 @@
       background: #fff;
       display: flex;
       justify-content: center;
+      align-items: center;
+      position: relative;
     }
 
     .brand {
@@ -68,12 +72,15 @@
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 0;
       padding: 0;
-      border-bottom: 1px solid var(--line);
+      border-bottom: 5px solid var(--line-strong);
       background: #fff;
     }
 
     .window-btn {
-      border: 1px solid #222;
+      border-top: 1px solid #222;
+      border-bottom: 1px solid #222;
+      border-left: 5px solid #222;
+      border-right: 5px solid #222;
       background: #fff;
       color: #111;
       border-radius: 0;
@@ -86,6 +93,10 @@
       width: 100%;
     }
 
+    .window-btn + .window-btn {
+      border-left-width: 0;
+    }
+
     .window-btn:hover {
       background: #f0f0f0;
     }
@@ -94,6 +105,59 @@
       background: #111;
       color: #fff;
       border-color: #111;
+    }
+
+    .admin-logo-btn {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 36px;
+      height: 36px;
+      border: 1px solid #111;
+      border-radius: 3px;
+      background: #fff;
+      padding: 0;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .admin-logo-btn::before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #111;
+      position: absolute;
+      top: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .admin-logo-btn::after {
+      content: "";
+      width: 18px;
+      height: 10px;
+      border-radius: 10px 10px 3px 3px;
+      background: #111;
+      position: absolute;
+      bottom: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .admin-flyout {
+      position: fixed;
+      top: 84px;
+      right: 16px;
+      width: min(360px, calc(100vw - 32px));
+      border: 2px solid #111;
+      background: #fff;
+      padding: 10px;
+      z-index: 1000;
+      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.18);
     }
 
     .windows {
@@ -124,18 +188,112 @@
       color: #111;
     }
 
-    .post-image {
-      width: 100%;
-      max-width: 520px;
-      display: block;
-      border-radius: 10px;
+    .admin-panel,
+    .login-panel,
+    .posts-panel {
       border: 1px solid #111;
+      padding: 12px;
+      margin: 10px 0;
+      background: #fff;
     }
 
-    .post-caption {
+    .panel-label {
+      margin: 0 0 8px;
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: lowercase;
+    }
+
+    .auth-row,
+    .admin-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    textarea {
+      width: 100%;
+      border: 1px solid #222;
+      padding: 10px;
+      font: inherit;
+      color: #111;
+      background: #fff;
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    .btn {
+      border: 1px solid #222;
+      background: #fff;
+      color: #111;
+      padding: 9px 12px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: lowercase;
+    }
+
+    .btn:hover {
+      background: #f0f0f0;
+    }
+
+    .btn.primary {
+      background: #111;
+      color: #fff;
+      border-color: #111;
+    }
+
+    .status {
+      margin: 8px 0 0;
+      font-size: 14px;
+      min-height: 18px;
+    }
+
+    .status.ok {
+      color: var(--ok);
+    }
+
+    .status.warn {
+      color: var(--warn);
+    }
+
+    .post-list {
+      list-style: none;
       margin: 10px 0 0;
-      color: #222;
-      font-size: 15px;
+      padding: 0;
+      display: grid;
+      gap: 8px;
+    }
+
+    .post-item {
+      border: 1px solid #222;
+      padding: 10px;
+      background: #fff;
+    }
+
+    .post-text {
+      margin: 0 0 6px;
+      white-space: pre-wrap;
+    }
+
+    .post-meta {
+      margin: 0;
+      font-size: 12px;
+      color: #444;
+    }
+
+    .post-image {
+      display: block;
+      width: 100%;
+      max-width: 460px;
+      border: 1px solid #222;
+      margin: 8px 0 6px;
     }
 
     .center-text {
@@ -147,6 +305,16 @@
       font-weight: 800;
       text-transform: lowercase;
       color: #111;
+    }
+
+    .hint {
+      margin: 0;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .hidden {
+      display: none;
     }
 
     @keyframes reveal {
@@ -183,6 +351,7 @@
   <main class="site">
     <section class="wrap">
       <header class="topbar">
+        <button id="adminToggleBtn" class="admin-logo-btn" type="button" aria-label="Open admin panel" title="Admin"></button>
         <h1 class="brand">RAKETEX</h1>
       </header>
 
@@ -193,14 +362,46 @@
       </nav>
 
       <section class="windows" aria-live="polite">
+        <aside id="adminFlyout" class="admin-flyout hidden" aria-label="Admin panel">
+          <div class="admin-actions" style="justify-content: space-between; margin-bottom: 6px;">
+            <p class="panel-label" style="margin: 0;">admin mode</p>
+            <button id="closeAdminBtn" class="btn" type="button">close</button>
+          </div>
+
+          <section class="login-panel" id="loginPanel">
+            <p class="panel-label">admin sign in</p>
+            <div class="auth-row">
+              <input id="adminUser" type="text" placeholder="username" autocomplete="username" />
+              <input id="adminPass" type="password" placeholder="password" autocomplete="current-password" />
+            </div>
+            <div class="admin-actions" style="margin-top: 8px;">
+              <button id="loginBtn" class="btn primary" type="button">sign in</button>
+            </div>
+            <p id="loginStatus" class="status"></p>
+          </section>
+
+          <section class="admin-panel hidden" id="adminPanel">
+            <p class="panel-label">admin editor</p>
+            <textarea id="postInput" placeholder="Write a new post message..."></textarea>
+            <div style="margin-top: 8px;">
+              <input id="postImageInput" type="file" accept="image/*" />
+            </div>
+            <div class="admin-actions" style="margin-top: 8px;">
+              <button id="savePostBtn" class="btn primary" type="button">publish post</button>
+              <button id="logoutBtn" class="btn" type="button">sign out</button>
+            </div>
+            <p id="saveStatus" class="status"></p>
+          </section>
+        </aside>
+
         <article class="window active" id="posts">
           <h2 class="panel-title">posts</h2>
-          <img
-            class="post-image"
-            src="assets/images/falcon-heavy.jpg"
-            alt="Falcon Heavy Demo Mission launch"
-          />
-          <p class="post-caption">Falcon Heavy Demo Mission launch image.</p>
+
+          <section class="posts-panel">
+            <p class="panel-label">latest posts</p>
+            <p id="noPosts" class="hint">No admin posts yet.</p>
+            <ul id="postList" class="post-list"></ul>
+          </section>
         </article>
 
         <article class="window" id="shop">
@@ -218,6 +419,27 @@
     const buttons = document.querySelectorAll(".window-btn");
     const windows = document.querySelectorAll(".window");
 
+    const adminToggleBtn = document.getElementById("adminToggleBtn");
+    const closeAdminBtn = document.getElementById("closeAdminBtn");
+    const adminFlyout = document.getElementById("adminFlyout");
+    const loginPanel = document.getElementById("loginPanel");
+    const adminPanel = document.getElementById("adminPanel");
+    const loginBtn = document.getElementById("loginBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const savePostBtn = document.getElementById("savePostBtn");
+    const postInput = document.getElementById("postInput");
+    const postImageInput = document.getElementById("postImageInput");
+    const adminUser = document.getElementById("adminUser");
+    const adminPass = document.getElementById("adminPass");
+    const loginStatus = document.getElementById("loginStatus");
+    const saveStatus = document.getElementById("saveStatus");
+    const postList = document.getElementById("postList");
+    const noPosts = document.getElementById("noPosts");
+
+    const ADMIN_USERNAME = "admin";
+    const ADMIN_PASSWORD = "raketex123";
+    const AUTH_KEY = "raketex_admin_auth";
+
     function setActiveWindow(windowId) {
       windows.forEach((windowItem) => {
         windowItem.classList.toggle("active", windowItem.id === windowId);
@@ -233,6 +455,203 @@
         setActiveWindow(button.dataset.window);
       });
     });
+
+    adminToggleBtn.addEventListener("click", () => {
+      adminFlyout.classList.toggle("hidden");
+    });
+
+    closeAdminBtn.addEventListener("click", () => {
+      adminFlyout.classList.add("hidden");
+    });
+
+    function isAdminAuthenticated() {
+      return sessionStorage.getItem(AUTH_KEY) === "yes";
+    }
+
+    function setStatus(element, message, type) {
+      element.textContent = message;
+      element.classList.remove("ok", "warn");
+      if (type) {
+        element.classList.add(type);
+      }
+    }
+
+    function updateAdminUi() {
+      const isAdmin = isAdminAuthenticated();
+      loginPanel.classList.toggle("hidden", isAdmin);
+      adminPanel.classList.toggle("hidden", !isAdmin);
+      if (!isAdmin) {
+        postInput.value = "";
+      }
+    }
+
+    function openDb() {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open("raketexDb", 1);
+
+        request.onupgradeneeded = () => {
+          const db = request.result;
+          if (!db.objectStoreNames.contains("posts")) {
+            const store = db.createObjectStore("posts", { keyPath: "id", autoIncrement: true });
+            store.createIndex("createdAt", "createdAt", { unique: false });
+          }
+        };
+
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    async function savePost(text, imageDataUrl) {
+      const db = await openDb();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction("posts", "readwrite");
+        const store = tx.objectStore("posts");
+
+        store.add({
+          text,
+          imageDataUrl,
+          createdAt: new Date().toISOString(),
+          author: "admin"
+        });
+
+        tx.oncomplete = () => {
+          db.close();
+          resolve();
+        };
+
+        tx.onerror = () => {
+          db.close();
+          reject(tx.error);
+        };
+      });
+    }
+
+    async function loadPosts() {
+      const db = await openDb();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction("posts", "readonly");
+        const store = tx.objectStore("posts");
+        const request = store.getAll();
+
+        request.onsuccess = () => {
+          db.close();
+          const rows = request.result || [];
+          rows.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+          resolve(rows);
+        };
+
+        request.onerror = () => {
+          db.close();
+          reject(request.error);
+        };
+      });
+    }
+
+    function formatDate(iso) {
+      const date = new Date(iso);
+      return date.toLocaleString();
+    }
+
+    function fileToDataUrl(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(reader.error);
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function renderPosts() {
+      try {
+        const posts = await loadPosts();
+        postList.innerHTML = "";
+
+        if (!posts.length) {
+          noPosts.classList.remove("hidden");
+          return;
+        }
+
+        noPosts.classList.add("hidden");
+
+        posts.forEach((post) => {
+          const item = document.createElement("li");
+          item.className = "post-item";
+
+          if (post.text) {
+            const text = document.createElement("p");
+            text.className = "post-text";
+            text.textContent = post.text;
+            item.appendChild(text);
+          }
+
+          if (post.imageDataUrl) {
+            const image = document.createElement("img");
+            image.className = "post-image";
+            image.src = post.imageDataUrl;
+            image.alt = "Admin post image";
+            item.appendChild(image);
+          }
+
+          const meta = document.createElement("p");
+          meta.className = "post-meta";
+          meta.textContent = `by ${post.author} | ${formatDate(post.createdAt)}`;
+
+          item.appendChild(meta);
+          postList.appendChild(item);
+        });
+      } catch (error) {
+        noPosts.classList.remove("hidden");
+        noPosts.textContent = "Could not load posts from local database.";
+      }
+    }
+
+    loginBtn.addEventListener("click", () => {
+      const user = adminUser.value.trim();
+      const pass = adminPass.value;
+
+      if (user === ADMIN_USERNAME && pass === ADMIN_PASSWORD) {
+        sessionStorage.setItem(AUTH_KEY, "yes");
+        setStatus(loginStatus, "Signed in as admin.", "ok");
+        adminPass.value = "";
+        updateAdminUi();
+      } else {
+        setStatus(loginStatus, "Wrong username or password.", "warn");
+      }
+    });
+
+    logoutBtn.addEventListener("click", () => {
+      sessionStorage.removeItem(AUTH_KEY);
+      setStatus(saveStatus, "Signed out.", "ok");
+      updateAdminUi();
+    });
+
+    savePostBtn.addEventListener("click", async () => {
+      const text = postInput.value.trim();
+      const selectedImage = postImageInput.files[0];
+      if (!text && !selectedImage) {
+        setStatus(saveStatus, "Add text or an image before publishing.", "warn");
+        return;
+      }
+
+      try {
+        let imageDataUrl = "";
+        if (selectedImage) {
+          imageDataUrl = await fileToDataUrl(selectedImage);
+        }
+
+        await savePost(text, imageDataUrl);
+        postInput.value = "";
+        postImageInput.value = "";
+        setStatus(saveStatus, "Post saved to local database.", "ok");
+        await renderPosts();
+      } catch (error) {
+        setStatus(saveStatus, "Failed to save post.", "warn");
+      }
+    });
+
+    updateAdminUi();
+    renderPosts();
   </script>
 </body>
 </html>
