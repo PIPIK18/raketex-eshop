@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}Not Found - RAKETEX{% endblock %}
+
+{% block body %}
+  <section class="panel">
+    <h2>Not Found</h2>
+    <p class="muted">That post does not exist or is not published.</p>
+    <a class="btn primary" href="{{ url_for('home') }}">back to posts</a>
+  </section>
+{% endblock %}

@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RAKETEX - Mission Control</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Barlow:wght@400;600;700&display=swap");
+
+    :root {
+      --bg: #f3f5f6;
+      --ink: #141414;
+      --line: #1e1e1e;
+      --panel: #ffffff;
+      --accent: #d82323;
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "Barlow", sans-serif; background: radial-gradient(circle at top right, #fff 10%, #edf1f4 70%); color: var(--ink); }
+    .shell { max-width: 1200px; margin: 16px auto; border: 2px solid var(--line); background: var(--panel); }
+    .top { display: flex; justify-content: space-between; align-items: center; padding: 12px 18px; border-bottom: 2px solid var(--line); }
+    .logo { font-family: "Orbitron", sans-serif; font-weight: 800; letter-spacing: 2px; font-size: 24px; }
+    .alert { padding: 6px 10px; border: 1px solid var(--line); font-size: 12px; font-weight: 700; background: #fff7f7; color: var(--accent); }
+    .menu { display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 2px solid var(--line); }
+    .menu a { text-align: center; text-decoration: none; color: var(--ink); padding: 12px; border-right: 2px solid var(--line); font-weight: 700; }
+    .menu a:last-child { border-right: 0; }
+    .menu a.active { background: var(--ink); color: #fff; }
+    .hero { display: grid; grid-template-columns: 1.2fr 1fr; gap: 0; border-bottom: 2px solid var(--line); }
+    .hero .left { padding: 24px; border-right: 2px solid var(--line); }
+    h1 { margin: 0 0 8px; font-family: "Orbitron", sans-serif; font-size: clamp(30px, 5vw, 52px); }
+    .left p { margin: 0 0 14px; font-size: 18px; max-width: 560px; }
+    .cta { display: inline-block; border: 2px solid var(--line); background: var(--accent); color: #fff; padding: 10px 16px; text-decoration: none; font-weight: 700; }
+    .hero .right { min-height: 260px; background: linear-gradient(140deg, #f9d7d7 0%, #f4f5f8 60%); display: grid; place-items: center; font-family: "Orbitron", sans-serif; font-size: 24px; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 14px; }
+    .card { border: 2px solid var(--line); padding: 12px; background: #fff; }
+    .tag { display: inline-block; border: 1px solid var(--line); font-size: 12px; padding: 2px 6px; margin-bottom: 8px; font-weight: 700; }
+    .price { font-size: 22px; font-weight: 700; margin: 8px 0; }
+    .btn { border: 1px solid var(--line); padding: 8px 10px; display: inline-block; text-decoration: none; color: var(--ink); font-weight: 700; }
+    @media (max-width: 900px) { .hero { grid-template-columns: 1fr; } .hero .left { border-right: 0; border-bottom: 2px solid var(--line); } .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="top">
+      <div class="logo">RAKETEX</div>
+      <div class="alert">LIVE STOCK SYNC</div>
+    </header>
+    <nav class="menu">
+      <a class="active" href="#">shop</a>
+      <a href="#">new drops</a>
+      <a href="#">mission logs</a>
+      <a href="#">support</a>
+    </nav>
+    <section class="hero">
+      <div class="left">
+        <h1>Launch-Ready Models</h1>
+        <p>Collectible rocket and spacecraft models with precise scale ratios and authenticated edition numbers.</p>
+        <a class="cta" href="#">Browse Collection</a>
+      </div>
+      <div class="right">CONTROL DECK</div>
+    </section>
+    <section class="grid">
+      <article class="card">
+        <span class="tag">1:144 SCALE</span>
+        <h3>Falcon Heavy Core</h3>
+        <p class="price">2 490 CZK</p>
+        <a class="btn" href="#">Add to Cart</a>
+      </article>
+      <article class="card">
+        <span class="tag">LIMITED</span>
+        <h3>Saturn V Heritage</h3>
+        <p class="price">3 990 CZK</p>
+        <a class="btn" href="#">Add to Cart</a>
+      </article>
+      <article class="card">
+        <span class="tag">PREORDER</span>
+        <h3>Starship Block 2</h3>
+        <p class="price">4 590 CZK</p>
+        <a class="btn" href="#">Reserve</a>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

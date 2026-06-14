@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Login - RAKETEX{% endblock %}
+
+{% block body %}
+  <div class="login-wrap">
+    <section class="panel login-panel">
+      <h2>Admin Login</h2>
+      <form method="post">
+        <div class="field">
+          <label for="username">username</label>
+          <input id="username" name="username" type="text" autocomplete="username" required />
+        </div>
+        <div class="field">
+          <label for="password">password</label>
+          <input id="password" name="password" type="password" autocomplete="current-password" required />
+        </div>
+        <button class="btn primary" type="submit">sign in</button>
+      </form>
+    </section>
+  </div>
+{% endblock %}

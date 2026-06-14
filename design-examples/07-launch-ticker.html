@@ -1,0 +1,683 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RAKETEX - Launch Ticker Shop</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Teko:wght@500;700&family=Inter:wght@400;500;700&display=swap");
+
+    :root {
+      --bg: #090d13;
+      --ink: #f5f7fa;
+      --muted: #9aa3b0;
+      --line: #273344;
+      --panel: #101824;
+      --panel-2: #0d1520;
+      --accent: #f88c3d;
+      --good: #62d8a0;
+      --warn: #ff7373;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: radial-gradient(circle at 80% 0%, #1f2a3d 0%, #090d13 35%);
+      color: var(--ink);
+      font-family: "Inter", sans-serif;
+    }
+
+    button, input, textarea { font: inherit; }
+    button { cursor: pointer; }
+    .page { max-width: 1260px; margin: 0 auto; padding: 18px; }
+    .ticker { border: 1px solid var(--line); background: #0c121b; padding: 8px 12px; font-size: 14px; color: #ffd2b2; }
+    .top { margin-top: 10px; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 8px; }
+    .logo { margin: 0; font-family: "Teko", sans-serif; letter-spacing: 1px; font-size: 58px; line-height: .8; }
+    .menu { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+    .nav-btn, .icon-btn, .btn {
+      border: 1px solid var(--line);
+      background: transparent;
+      color: var(--ink);
+      padding: 8px 11px;
+      font-weight: 700;
+      text-transform: lowercase;
+    }
+    .nav-btn.active, .btn.primary { border-color: var(--accent); background: rgba(248, 140, 61, .13); color: #fff; }
+    .icon-btn { min-width: 42px; }
+
+    .hero {
+      margin-top: 10px;
+      border: 1px solid var(--line);
+      min-height: 340px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-end;
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(100deg, rgba(6, 9, 14, .94) 18%, rgba(6, 9, 14, .38) 68%), url("../assets/design-images/falcon-heavy-liftoff.jpg") center/cover;
+    }
+    .hero-content { position: relative; padding: 26px; max-width: 720px; }
+    .hero h2 { margin: 0 0 10px; font-family: "Teko", sans-serif; font-size: 76px; line-height: .88; letter-spacing: 0; }
+    .hero p { margin: 0 0 14px; color: #d8e0e8; max-width: 620px; }
+
+    .view { display: none; }
+    .view.active { display: block; }
+    .layout { margin-top: 12px; display: grid; grid-template-columns: 1fr 360px; gap: 10px; }
+    .panel { border: 1px solid var(--line); background: var(--panel); padding: 12px; }
+    .panel h3 { margin: 0 0 10px; font-family: "Teko", sans-serif; font-size: 34px; line-height: 1; letter-spacing: 0; }
+    .muted { color: var(--muted); font-size: 13px; margin: 4px 0; }
+    .status { min-height: 20px; font-size: 13px; margin: 8px 0 0; color: var(--muted); }
+    .status.ok { color: var(--good); }
+    .status.warn { color: var(--warn); }
+    .hidden { display: none; }
+
+    .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px; }
+    .product-card, .cart-item, .post-item, .order-item, .admin-item {
+      border: 1px solid #2d3a4d;
+      background: var(--panel-2);
+      padding: 10px;
+    }
+    .product-image, .post-image {
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      object-fit: cover;
+      border: 1px solid #304055;
+      margin-bottom: 8px;
+      background: #0a1018;
+    }
+    .product-name, .cart-name, .post-text { margin: 0 0 6px; font-weight: 700; }
+    .price { color: #ffc59e; margin: 4px 0 6px; font-weight: 700; }
+    .stock-ok { color: var(--good); margin: 0 0 8px; font-size: 13px; }
+    .stock-low { color: #ffd072; margin: 0 0 8px; font-size: 13px; }
+    .stock-out { color: var(--warn); margin: 0 0 8px; font-size: 13px; }
+
+    .list { list-style: none; padding: 0; margin: 8px 0 0; display: grid; gap: 8px; }
+    .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .field { display: grid; gap: 5px; margin-bottom: 8px; }
+    .field label { color: var(--muted); font-size: 12px; font-weight: 700; text-transform: lowercase; }
+    input, textarea {
+      width: 100%;
+      border: 1px solid #35445a;
+      background: #080d14;
+      color: var(--ink);
+      padding: 9px;
+    }
+    textarea { min-height: 78px; resize: vertical; }
+    input[type="file"], input[type="checkbox"] { width: auto; }
+
+    .admin-drawer {
+      position: fixed;
+      top: 18px;
+      right: 18px;
+      width: min(420px, calc(100vw - 36px));
+      max-height: calc(100vh - 36px);
+      overflow: auto;
+      z-index: 20;
+      border: 1px solid var(--line);
+      background: #0a1018;
+      padding: 12px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, .45);
+    }
+
+    @media (max-width: 980px) {
+      .top { grid-template-columns: 1fr; }
+      .menu { justify-content: flex-start; }
+      .layout { grid-template-columns: 1fr; }
+      .hero h2 { font-size: 54px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="ticker">LIVE WORKBENCH: model rocket kits, parts, build logs and local checkout prototype</div>
+    <header class="top">
+      <h1 class="logo">RAKETEX</h1>
+      <nav class="menu">
+        <button class="nav-btn active" data-view="shop" type="button">shop</button>
+        <button class="nav-btn" data-view="posts" type="button">posts</button>
+        <button class="nav-btn" data-view="orders" type="button">orders</button>
+        <button id="adminToggle" class="icon-btn" type="button" title="Admin">admin</button>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div class="hero-content">
+        <h2>Build. Test. Launch.</h2>
+        <p>Launch Ticker is now a working RAKETEX storefront prototype: products, stock, cart, checkout, posts and admin tools all run locally.</p>
+        <button class="btn primary" data-view="shop" type="button">shop kits</button>
+      </div>
+    </section>
+
+    <aside id="adminDrawer" class="admin-drawer hidden" aria-label="Admin panel">
+      <div class="row" style="justify-content: space-between; margin-bottom: 8px;">
+        <strong>admin mode</strong>
+        <button id="adminClose" class="btn" type="button">close</button>
+      </div>
+
+      <section id="loginPanel">
+        <div class="field"><label for="adminUser">username</label><input id="adminUser" type="text" autocomplete="username" /></div>
+        <div class="field"><label for="adminPass">password</label><input id="adminPass" type="password" autocomplete="current-password" /></div>
+        <button id="loginBtn" class="btn primary" type="button">sign in</button>
+        <p id="loginStatus" class="status"></p>
+      </section>
+
+      <section id="adminPanel" class="hidden">
+        <h3>Post</h3>
+        <div class="field"><textarea id="postInput" placeholder="Write a post..."></textarea></div>
+        <div class="field"><label for="postImageInput">post image</label><input id="postImageInput" type="file" accept="image/*" /></div>
+        <button id="savePostBtn" class="btn primary" type="button">publish post</button>
+        <p id="saveStatus" class="status"></p>
+
+        <h3>Product</h3>
+        <div class="field"><label for="prodName">name</label><input id="prodName" type="text" /></div>
+        <div class="row">
+          <div class="field" style="flex: 1;"><label for="prodSku">sku</label><input id="prodSku" type="text" /></div>
+          <div class="field" style="flex: 1;"><label for="prodPrice">price</label><input id="prodPrice" type="number" min="0" step="0.01" /></div>
+          <div class="field" style="flex: 1;"><label for="prodStock">stock</label><input id="prodStock" type="number" min="0" step="1" /></div>
+        </div>
+        <div class="field"><label for="prodDesc">description</label><textarea id="prodDesc"></textarea></div>
+        <div class="field"><label for="prodImage">image</label><input id="prodImage" type="file" accept="image/*" /></div>
+        <label class="row"><input id="prodPublished" type="checkbox" checked /> published</label>
+        <div class="row" style="margin-top: 8px;">
+          <button id="saveProductBtn" class="btn primary" type="button">save product</button>
+          <button id="logoutBtn" class="btn" type="button">sign out</button>
+        </div>
+        <p id="productStatus" class="status"></p>
+
+        <h3>Inventory</h3>
+        <ul id="adminProductList" class="list"></ul>
+        <h3>Recent Orders</h3>
+        <ul id="adminOrderList" class="list"></ul>
+      </section>
+    </aside>
+
+    <section id="shop" class="view active">
+      <div class="layout">
+        <section class="panel">
+          <div class="row" style="justify-content: space-between;">
+            <h3>Shop</h3>
+            <input id="productSearch" type="text" placeholder="search products" style="max-width: 230px;" />
+          </div>
+          <p id="noProducts" class="muted">No products published yet.</p>
+          <div id="productGrid" class="product-grid"></div>
+        </section>
+
+        <aside class="panel">
+          <h3>Cart</h3>
+          <p id="emptyCart" class="muted">Cart is empty.</p>
+          <ul id="cartList" class="list"></ul>
+          <p id="cartTotal" class="price">Total: 0.00 CZK</p>
+          <div class="field"><label for="customerName">name</label><input id="customerName" type="text" /></div>
+          <div class="field"><label for="customerEmail">email</label><input id="customerEmail" type="email" /></div>
+          <div class="field"><label for="customerAddress">delivery address</label><textarea id="customerAddress"></textarea></div>
+          <button id="checkoutBtn" class="btn primary" type="button">place order</button>
+          <p id="checkoutStatus" class="status"></p>
+        </aside>
+      </div>
+    </section>
+
+    <section id="posts" class="view">
+      <section class="panel" style="margin-top: 12px;">
+        <h3>Posts</h3>
+        <p id="noPosts" class="muted">No admin posts yet.</p>
+        <ul id="postList" class="list"></ul>
+      </section>
+    </section>
+
+    <section id="orders" class="view">
+      <section class="panel" style="margin-top: 12px;">
+        <h3>Local Order History</h3>
+        <p id="noOrders" class="muted">No orders yet.</p>
+        <ul id="orderList" class="list"></ul>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const navButtons = document.querySelectorAll("[data-view]");
+    const views = document.querySelectorAll(".view");
+
+    const ADMIN_USERNAME = "admin";
+    const ADMIN_PASSWORD = "raketex123";
+    const AUTH_KEY = "raketex_admin_auth";
+    const CART_KEY = "raketex_cart_v1";
+
+    let productsCache = [];
+    let cart = loadCart();
+
+    function setView(viewId) {
+      views.forEach((view) => view.classList.toggle("active", view.id === viewId));
+      document.querySelectorAll(".nav-btn").forEach((button) => {
+        button.classList.toggle("active", button.dataset.view === viewId);
+      });
+    }
+
+    navButtons.forEach((button) => button.addEventListener("click", () => setView(button.dataset.view)));
+    $("adminToggle").addEventListener("click", () => $("adminDrawer").classList.toggle("hidden"));
+    $("adminClose").addEventListener("click", () => $("adminDrawer").classList.add("hidden"));
+
+    function openDb() {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open("raketexDb", 2);
+        request.onupgradeneeded = () => {
+          const db = request.result;
+          if (!db.objectStoreNames.contains("posts")) {
+            const posts = db.createObjectStore("posts", { keyPath: "id", autoIncrement: true });
+            posts.createIndex("createdAt", "createdAt", { unique: false });
+          }
+          if (!db.objectStoreNames.contains("products")) {
+            const products = db.createObjectStore("products", { keyPath: "id", autoIncrement: true });
+            products.createIndex("createdAt", "createdAt", { unique: false });
+          }
+          if (!db.objectStoreNames.contains("orders")) {
+            const orders = db.createObjectStore("orders", { keyPath: "id", autoIncrement: true });
+            orders.createIndex("createdAt", "createdAt", { unique: false });
+          }
+        };
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    async function getAll(storeName) {
+      const db = await openDb();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(storeName, "readonly");
+        const request = tx.objectStore(storeName).getAll();
+        request.onsuccess = () => { db.close(); resolve(request.result || []); };
+        request.onerror = () => { db.close(); reject(request.error); };
+      });
+    }
+
+    async function addRecord(storeName, value) {
+      const db = await openDb();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(storeName, "readwrite");
+        tx.objectStore(storeName).add(value);
+        tx.oncomplete = () => { db.close(); resolve(); };
+        tx.onerror = () => { db.close(); reject(tx.error); };
+      });
+    }
+
+    async function putRecord(storeName, value) {
+      const db = await openDb();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(storeName, "readwrite");
+        tx.objectStore(storeName).put(value);
+        tx.oncomplete = () => { db.close(); resolve(); };
+        tx.onerror = () => { db.close(); reject(tx.error); };
+      });
+    }
+
+    async function deleteRecord(storeName, id) {
+      const db = await openDb();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(storeName, "readwrite");
+        tx.objectStore(storeName).delete(id);
+        tx.oncomplete = () => { db.close(); resolve(); };
+        tx.onerror = () => { db.close(); reject(tx.error); };
+      });
+    }
+
+    function loadCart() {
+      try {
+        const parsed = JSON.parse(localStorage.getItem(CART_KEY) || "[]");
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveCart() { localStorage.setItem(CART_KEY, JSON.stringify(cart)); }
+    function formatPrice(value) { return `${Number(value).toFixed(2)} CZK`; }
+    function formatDate(iso) { return new Date(iso).toLocaleString(); }
+    function productById(id) { return productsCache.find((product) => product.id === id); }
+    function setStatus(el, text, type) { el.textContent = text; el.className = `status ${type || ""}`; }
+
+    function fileToDataUrl(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(reader.error);
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function updateAdminUi() {
+      const isAdmin = sessionStorage.getItem(AUTH_KEY) === "yes";
+      $("loginPanel").classList.toggle("hidden", isAdmin);
+      $("adminPanel").classList.toggle("hidden", !isAdmin);
+    }
+
+    function stockClass(stock) {
+      if (stock <= 0) return "stock-out";
+      if (stock <= 3) return "stock-low";
+      return "stock-ok";
+    }
+
+    function stockText(stock) {
+      if (stock <= 0) return "out of stock";
+      if (stock <= 3) return `only ${stock} left`;
+      return `${stock} in stock`;
+    }
+
+    function renderProducts() {
+      const term = $("productSearch").value.trim().toLowerCase();
+      const products = productsCache.filter((p) => p.published).filter((p) => {
+        if (!term) return true;
+        return [p.name, p.sku, p.description].join(" ").toLowerCase().includes(term);
+      });
+
+      $("productGrid").innerHTML = "";
+      $("noProducts").classList.toggle("hidden", products.length > 0);
+
+      products.forEach((product) => {
+        const card = document.createElement("article");
+        card.className = "product-card";
+        card.innerHTML = `
+          ${product.imageDataUrl ? `<img class="product-image" src="${product.imageDataUrl}" alt="">` : ""}
+          <p class="product-name">${product.name}</p>
+          <p class="muted">${product.description || ""}</p>
+          <p class="price">${formatPrice(product.price)}</p>
+          <p class="${stockClass(product.stock)}">${stockText(product.stock)}</p>
+        `;
+        const button = document.createElement("button");
+        button.className = "btn primary";
+        button.type = "button";
+        button.textContent = "add to cart";
+        button.disabled = product.stock <= 0;
+        button.addEventListener("click", () => addToCart(product.id));
+        card.appendChild(button);
+        $("productGrid").appendChild(card);
+      });
+    }
+
+    function renderCart() {
+      $("cartList").innerHTML = "";
+      $("emptyCart").classList.toggle("hidden", cart.length > 0);
+      let total = 0;
+
+      cart.forEach((line) => {
+        const product = productById(line.productId);
+        if (!product) return;
+        total += product.price * line.qty;
+
+        const item = document.createElement("li");
+        item.className = "cart-item";
+        item.innerHTML = `<p class="cart-name">${product.name}</p><p class="muted">qty: ${line.qty} | ${formatPrice(product.price * line.qty)}</p>`;
+
+        const row = document.createElement("div");
+        row.className = "row";
+        [["-", -1], ["+", 1], ["remove", 0]].forEach(([label, delta]) => {
+          const btn = document.createElement("button");
+          btn.className = "btn";
+          btn.type = "button";
+          btn.textContent = label;
+          if (delta === 1) btn.disabled = line.qty >= product.stock;
+          btn.addEventListener("click", () => delta === 0 ? removeFromCart(line.productId) : changeCartQty(line.productId, delta));
+          row.appendChild(btn);
+        });
+        item.appendChild(row);
+        $("cartList").appendChild(item);
+      });
+
+      $("cartTotal").textContent = `Total: ${formatPrice(total)}`;
+    }
+
+    function addToCart(productId) {
+      const product = productById(productId);
+      if (!product || product.stock <= 0) return;
+      const line = cart.find((item) => item.productId === productId);
+      if (line) line.qty = Math.min(line.qty + 1, product.stock);
+      else cart.push({ productId, qty: 1 });
+      saveCart();
+      renderCart();
+    }
+
+    function removeFromCart(productId) {
+      cart = cart.filter((line) => line.productId !== productId);
+      saveCart();
+      renderCart();
+    }
+
+    function changeCartQty(productId, delta) {
+      const line = cart.find((item) => item.productId === productId);
+      const product = productById(productId);
+      if (!line || !product) return;
+      const next = line.qty + delta;
+      if (next <= 0) removeFromCart(productId);
+      else line.qty = Math.min(next, product.stock);
+      saveCart();
+      renderCart();
+    }
+
+    async function placeOrder(customer) {
+      const db = await openDb();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(["products", "orders"], "readwrite");
+        const productsStore = tx.objectStore("products");
+        const ordersStore = tx.objectStore("orders");
+        const orderItems = [];
+        const updates = [];
+        let total = 0;
+        let pending = cart.length;
+        let failed = false;
+
+        if (!pending) {
+          db.close();
+          reject(new Error("Cart is empty."));
+          return;
+        }
+
+        cart.forEach((line) => {
+          const req = productsStore.get(line.productId);
+          req.onsuccess = () => {
+            if (failed) return;
+            const product = req.result;
+            if (!product || product.stock < line.qty) {
+              failed = true;
+              reject(new Error(product ? `Not enough stock for ${product.name}.` : "Product missing."));
+              tx.abort();
+              return;
+            }
+            const lineTotal = product.price * line.qty;
+            total += lineTotal;
+            orderItems.push({ productId: product.id, name: product.name, sku: product.sku, price: product.price, qty: line.qty, lineTotal });
+            updates.push({ ...product, stock: product.stock - line.qty });
+            pending -= 1;
+            if (pending === 0) {
+              updates.forEach((productUpdate) => productsStore.put(productUpdate));
+              ordersStore.add({ ...customer, items: orderItems, total, status: "received", createdAt: new Date().toISOString() });
+            }
+          };
+          req.onerror = () => {
+            failed = true;
+            reject(req.error);
+            tx.abort();
+          };
+        });
+
+        tx.oncomplete = () => { db.close(); resolve(); };
+        tx.onerror = () => { db.close(); if (!failed) reject(tx.error); };
+        tx.onabort = () => db.close();
+      });
+    }
+
+    async function refreshProducts() {
+      productsCache = await getAll("products");
+      productsCache.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      renderProducts();
+      renderCart();
+      renderAdminProducts();
+    }
+
+    async function renderPosts() {
+      const posts = await getAll("posts");
+      posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      $("postList").innerHTML = "";
+      $("noPosts").classList.toggle("hidden", posts.length > 0);
+      posts.forEach((post) => {
+        const item = document.createElement("li");
+        item.className = "post-item";
+        item.innerHTML = `${post.text ? `<p class="post-text">${post.text}</p>` : ""}${post.imageDataUrl ? `<img class="post-image" src="${post.imageDataUrl}" alt="">` : ""}<p class="muted">by ${post.author} | ${formatDate(post.createdAt)}</p>`;
+        $("postList").appendChild(item);
+      });
+    }
+
+    async function renderOrders() {
+      const orders = await getAll("orders");
+      orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      $("orderList").innerHTML = "";
+      $("adminOrderList").innerHTML = "";
+      $("noOrders").classList.toggle("hidden", orders.length > 0);
+
+      if (!orders.length) {
+        $("adminOrderList").innerHTML = `<li class="admin-item">No orders yet.</li>`;
+        return;
+      }
+
+      orders.forEach((order) => {
+        const customerName = order.name || order.customerName || "customer";
+        const customerEmail = order.email || order.customerEmail || "";
+        const item = document.createElement("li");
+        item.className = "order-item";
+        item.innerHTML = `<p class="post-text">Order #${order.id} | ${formatPrice(order.total)}</p><p class="muted">${customerName} | ${formatDate(order.createdAt)} | ${order.status}</p>`;
+        $("orderList").appendChild(item);
+
+        const adminItem = document.createElement("li");
+        adminItem.className = "admin-item";
+        adminItem.innerHTML = `<p class="post-text">#${order.id} ${customerName}</p><p class="muted">${customerEmail} | ${order.items.length} item(s) | ${formatPrice(order.total)}</p>`;
+        $("adminOrderList").appendChild(adminItem);
+      });
+    }
+
+    function renderAdminProducts() {
+      $("adminProductList").innerHTML = "";
+      if (!productsCache.length) {
+        $("adminProductList").innerHTML = `<li class="admin-item">No products yet.</li>`;
+        return;
+      }
+
+      productsCache.forEach((product) => {
+        const item = document.createElement("li");
+        item.className = "admin-item";
+        item.innerHTML = `<p class="post-text">${product.name}</p><p class="muted">${formatPrice(product.price)} | stock ${product.stock} | ${product.published ? "published" : "hidden"}</p>`;
+        const row = document.createElement("div");
+        row.className = "row";
+
+        [
+          ["stock -", async () => putRecord("products", { ...product, stock: Math.max(0, product.stock - 1) })],
+          ["stock +", async () => putRecord("products", { ...product, stock: product.stock + 1 })],
+          [product.published ? "hide" : "publish", async () => putRecord("products", { ...product, published: !product.published })],
+          ["delete", async () => { await deleteRecord("products", product.id); cart = cart.filter((line) => line.productId !== product.id); saveCart(); }]
+        ].forEach(([label, action]) => {
+          const button = document.createElement("button");
+          button.className = "btn";
+          button.type = "button";
+          button.textContent = label;
+          button.addEventListener("click", async () => { await action(); await refreshProducts(); });
+          row.appendChild(button);
+        });
+
+        item.appendChild(row);
+        $("adminProductList").appendChild(item);
+      });
+    }
+
+    $("loginBtn").addEventListener("click", () => {
+      if ($("adminUser").value.trim() === ADMIN_USERNAME && $("adminPass").value === ADMIN_PASSWORD) {
+        sessionStorage.setItem(AUTH_KEY, "yes");
+        $("adminPass").value = "";
+        setStatus($("loginStatus"), "Signed in.", "ok");
+        updateAdminUi();
+      } else {
+        setStatus($("loginStatus"), "Wrong username or password.", "warn");
+      }
+    });
+
+    $("logoutBtn").addEventListener("click", () => {
+      sessionStorage.removeItem(AUTH_KEY);
+      updateAdminUi();
+    });
+
+    $("savePostBtn").addEventListener("click", async () => {
+      const text = $("postInput").value.trim();
+      const file = $("postImageInput").files[0];
+      if (!text && !file) {
+        setStatus($("saveStatus"), "Add text or an image.", "warn");
+        return;
+      }
+      const imageDataUrl = file ? await fileToDataUrl(file) : "";
+      await addRecord("posts", { text, imageDataUrl, author: "admin", createdAt: new Date().toISOString() });
+      $("postInput").value = "";
+      $("postImageInput").value = "";
+      setStatus($("saveStatus"), "Post saved.", "ok");
+      await renderPosts();
+    });
+
+    $("saveProductBtn").addEventListener("click", async () => {
+      const name = $("prodName").value.trim();
+      const price = Number($("prodPrice").value);
+      const stock = Number($("prodStock").value);
+      if (!name || !Number.isFinite(price) || !Number.isFinite(stock) || price < 0 || stock < 0) {
+        setStatus($("productStatus"), "Fill name, valid price and stock.", "warn");
+        return;
+      }
+      const file = $("prodImage").files[0];
+      const imageDataUrl = file ? await fileToDataUrl(file) : "";
+      await addRecord("products", {
+        name,
+        sku: $("prodSku").value.trim(),
+        price,
+        stock: Math.floor(stock),
+        description: $("prodDesc").value.trim(),
+        imageDataUrl,
+        published: $("prodPublished").checked,
+        createdAt: new Date().toISOString()
+      });
+      ["prodName", "prodSku", "prodPrice", "prodStock", "prodDesc"].forEach((id) => $(id).value = "");
+      $("prodImage").value = "";
+      $("prodPublished").checked = true;
+      setStatus($("productStatus"), "Product saved.", "ok");
+      await refreshProducts();
+    });
+
+    $("productSearch").addEventListener("input", renderProducts);
+
+    $("checkoutBtn").addEventListener("click", async () => {
+      const name = $("customerName").value.trim();
+      const email = $("customerEmail").value.trim();
+      const address = $("customerAddress").value.trim();
+      if (!name || !email || !address) {
+        setStatus($("checkoutStatus"), "Fill name, email and address.", "warn");
+        return;
+      }
+      try {
+        await placeOrder({ name, email, address });
+        cart = [];
+        saveCart();
+        ["customerName", "customerEmail", "customerAddress"].forEach((id) => $(id).value = "");
+        setStatus($("checkoutStatus"), "Order placed successfully.", "ok");
+        await refreshProducts();
+        await renderOrders();
+      } catch (error) {
+        setStatus($("checkoutStatus"), error.message || "Could not place order.", "warn");
+      }
+    });
+
+    async function bootstrap() {
+      updateAdminUi();
+      await refreshProducts();
+      await renderPosts();
+      await renderOrders();
+    }
+
+    bootstrap();
+  </script>
+</body>
+</html>

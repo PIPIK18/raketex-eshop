@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RAKETEX - Engineering Market</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Archivo+Black&family=Public+Sans:wght@400;500;700&display=swap");
+    :root { --bg:#f6f7f9; --ink:#111620; --line:#202737; --muted:#5d6678; --panel:#ffffff; --accent:#cc3f2f; --green:#0f8e72; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:linear-gradient(180deg,#fefefe,#eff3f6); color:var(--ink); font-family:"Public Sans",sans-serif; }
+    .page { max-width:1140px; margin:16px auto; padding:0 14px; }
+    .bar { border:1px solid var(--line); background:#fff; padding:10px 12px; display:flex; justify-content:space-between; align-items:center; }
+    .brand { margin:0; font-family:"Archivo Black",sans-serif; letter-spacing:.8px; font-size:28px; }
+    .bar nav { display:flex; gap:10px; flex-wrap:wrap; }
+    .bar a { text-decoration:none; color:var(--ink); font-size:14px; font-weight:700; }
+    .hero { margin-top:10px; border:1px solid var(--line); background:#fff; padding:20px; }
+    .hero h2 { margin:0 0 8px; font-size: clamp(28px, 5vw, 54px); line-height:.95; }
+    .hero p { margin:0; max-width:760px; color:var(--muted); }
+    .hero .strip { margin-top:14px; border:1px solid #b9c3d1; padding:10px; display:flex; gap:8px; flex-wrap:wrap; }
+    .chip { border:1px solid #8ea1be; padding:6px 8px; font-size:12px; font-weight:700; color:#23446a; background:#f5f9ff; }
+    .grid { margin-top:10px; display:grid; grid-template-columns:2fr 1fr; gap:10px; }
+    .panel { border:1px solid var(--line); background:var(--panel); padding:12px; }
+    .panel h3 { margin:0 0 10px; font-size:22px; }
+    .catalog { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+    .product { border:1px solid #bfc8d4; padding:10px; background:#fff; }
+    .thumb { height:100px; border:1px dashed #91a4bf; background:
+      linear-gradient(145deg, rgba(15,142,114,.15), rgba(204,63,47,.14)); margin-bottom:8px; }
+    .price { margin:5px 0 0; font-weight:700; color:var(--green); }
+    .feed .entry { border:1px solid #ced6e2; padding:8px; margin-bottom:8px; }
+    .feed .entry:last-child { margin-bottom:0; }
+    .entry p { margin:4px 0 0; color:var(--muted); font-size:13px; }
+    @media (max-width: 980px){ .grid { grid-template-columns:1fr; } .catalog { grid-template-columns:1fr 1fr; } }
+    @media (max-width: 560px){ .catalog { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="bar">
+      <h1 class="brand">RAKETEX</h1>
+      <nav>
+        <a href="#">kits</a>
+        <a href="#">components</a>
+        <a href="#">tooling</a>
+        <a href="#">learning</a>
+        <a href="#">shop</a>
+      </nav>
+    </header>
+    <section class="hero">
+      <h2>Engineering Store For Model Rocket Builders</h2>
+      <p>A broader identity that still starts with model rockets today, but can expand later into drones, RC systems, and other hobby engineering products without redesigning the whole brand.</p>
+      <div class="strip">
+        <span class="chip">Model Rocket Kits</span>
+        <span class="chip">Avionics</span>
+        <span class="chip">Recovery Systems</span>
+        <span class="chip">Workshop Tools</span>
+        <span class="chip">Future: RC & Mechatronics</span>
+      </div>
+    </section>
+    <section class="grid">
+      <section class="panel">
+        <h3>Featured Catalog</h3>
+        <div class="catalog">
+          <article class="product"><div class="thumb"></div><strong>Sport Flyer Kit</strong><p class="price">1 490 CZK</p></article>
+          <article class="product"><div class="thumb"></div><strong>Body Tube Set</strong><p class="price">390 CZK</p></article>
+          <article class="product"><div class="thumb"></div><strong>Parachute Pack</strong><p class="price">320 CZK</p></article>
+          <article class="product"><div class="thumb"></div><strong>Ignition Controller</strong><p class="price">1 090 CZK</p></article>
+          <article class="product"><div class="thumb"></div><strong>Telemetry Mini</strong><p class="price">1 690 CZK</p></article>
+          <article class="product"><div class="thumb"></div><strong>Fin Jig Tool</strong><p class="price">520 CZK</p></article>
+        </div>
+      </section>
+      <aside class="panel feed">
+        <h3>Learning & Community</h3>
+        <article class="entry"><strong>How to choose your first motor class</strong><p>Practical beginner path from safe test flights to higher impulse classes.</p></article>
+        <article class="entry"><strong>Build stream this Friday</strong><p>Live workshop: avionics bay assembly and wiring tips.</p></article>
+        <article class="entry"><strong>Flight day checklist</strong><p>Printable pre-launch and recovery checklist for your field box.</p></article>
+      </aside>
+    </section>
+  </main>
+</body>
+</html>

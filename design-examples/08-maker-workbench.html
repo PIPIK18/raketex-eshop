@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RAKETEX - Maker Workbench</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Sora:wght@500;700;800&family=Manrope:wght@400;600;700&display=swap");
+    :root { --bg:#eef3f4; --ink:#142022; --line:#1f3337; --panel:#ffffff; --accent:#ef6e2e; --mint:#00a58f; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:"Manrope",sans-serif; color:var(--ink); background:linear-gradient(170deg,#f8fbfb,#e8f0f1); }
+    .page { max-width:1180px; margin:18px auto; padding:0 14px; }
+    .top { border:2px solid var(--line); background:#fff; padding:12px 14px; display:flex; justify-content:space-between; align-items:center; }
+    .logo { margin:0; font-family:"Sora",sans-serif; font-size:30px; letter-spacing:.8px; }
+    .menu { display:flex; gap:8px; flex-wrap:wrap; }
+    .menu a { text-decoration:none; color:var(--ink); border:1px solid var(--line); padding:7px 10px; font-weight:700; }
+    .menu a.active { background:var(--ink); color:#fff; }
+    .hero { margin-top:10px; border:2px solid var(--line); background:#fff; padding:24px; display:grid; grid-template-columns:1.1fr .9fr; gap:16px; }
+    h2 { margin:0 0 8px; font-family:"Sora",sans-serif; font-size: clamp(32px,5vw,56px); line-height:.96; }
+    .hero p { margin:0 0 12px; max-width:600px; }
+    .cta { display:inline-block; text-decoration:none; border:2px solid var(--line); padding:9px 12px; font-weight:700; color:var(--ink); }
+    .cta.primary { background:var(--accent); color:#fff; border-color:#9f4317; margin-right:8px; }
+    .visual { border:2px dashed #6f8990; min-height:260px; background:
+      linear-gradient(140deg, rgba(0,165,143,.16), rgba(239,110,46,.14)),
+      repeating-linear-gradient(90deg, rgba(20,32,34,.06) 0 1px, transparent 1px 34px),
+      repeating-linear-gradient(0deg, rgba(20,32,34,.06) 0 1px, transparent 1px 34px);
+      display:grid; place-items:center; font-family:"Sora",sans-serif; color:#27464a; text-align:center; padding:10px; }
+    .sections { margin-top:10px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+    .card { border:2px solid var(--line); background:var(--panel); padding:12px; }
+    .card h3 { margin:0 0 8px; font-family:"Sora",sans-serif; font-size:20px; }
+    .item { border:1px solid #b9c9cd; padding:8px; margin-bottom:8px; }
+    .item:last-child { margin-bottom:0; }
+    .price { margin:4px 0 0; color:#1b6f61; font-weight:700; }
+    @media (max-width: 960px){ .hero { grid-template-columns:1fr; } .sections { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="top">
+      <h1 class="logo">RAKETEX</h1>
+      <nav class="menu">
+        <a class="active" href="#">kits</a>
+        <a href="#">parts</a>
+        <a href="#">build logs</a>
+        <a href="#">guides</a>
+        <a href="#">shop</a>
+      </nav>
+    </header>
+    <section class="hero">
+      <div>
+        <h2>Build. Test. Launch.</h2>
+        <p>A maker-focused storefront for hobby engineering and model rocket kits: airframes, avionics, recovery systems, and workshop essentials.</p>
+        <a class="cta primary" href="#">Shop Starter Kits</a>
+        <a class="cta" href="#">Read Build Guides</a>
+      </div>
+      <div class="visual">WORKBENCH ZONE<br />for kit photos / build previews</div>
+    </section>
+    <section class="sections">
+      <article class="card">
+        <h3>Starter Kits</h3>
+        <div class="item"><strong>Beginner Launch Kit</strong><p class="price">1 890 CZK</p></div>
+        <div class="item"><strong>Level 1 Composite Kit</strong><p class="price">3 490 CZK</p></div>
+      </article>
+      <article class="card">
+        <h3>Parts & Electronics</h3>
+        <div class="item"><strong>Altimeter Module</strong><p class="price">990 CZK</p></div>
+        <div class="item"><strong>Recovery Harness Set</strong><p class="price">420 CZK</p></div>
+      </article>
+      <article class="card">
+        <h3>Build Logs</h3>
+        <div class="item"><strong>Dual deployment wiring walkthrough</strong></div>
+        <div class="item"><strong>Fin alignment jig (DIY)</strong></div>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

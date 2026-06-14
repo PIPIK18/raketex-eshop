@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}RAKETEX - Build Log{% endblock %}
+
+{% block body %}
+  <section class="blog-head">
+    <form method="get">
+      <input name="q" type="text" value="{{ search_query or '' }}" placeholder="search posts" />
+    </form>
+  </section>
+
+  <section class="blog-list">
+    {% if posts %}
+      {% for post in posts %}
+        <a class="blog-entry" href="{{ url_for('post_detail', post_id=post.id) }}">
+          <div>
+            <h2>{{ post.title }}</h2>
+            <p class="blog-meta">Posted by admin on {{ post.created_at[:10] }} | {{ post.category }}</p>
+            <p class="blog-excerpt">{{ post.body[:260] }}{% if post.body|length > 260 %}...{% endif %}</p>
+          </div>
+          {% if post.image_filename %}
+            <img class="blog-thumb" src="{{ url_for('uploaded_file', filename=post.image_filename) }}" alt="" />
+          {% endif %}
+        </a>
+      {% endfor %}
+    {% else %}
+      <div class="blog-entry">
+        <div>
+          <h2>No posts yet</h2>
+          <p class="blog-excerpt">Create the first post from the admin page.</p>
+        </div>
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}

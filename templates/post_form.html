@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}{{ "Edit" if post else "New" }} Post - RAKETEX{% endblock %}
+
+{% block body %}
+  <section class="panel">
+    <h2>{{ "Edit" if post else "New" }} Post</h2>
+    <form method="post" enctype="multipart/form-data">
+      <div class="field">
+        <label for="title">title</label>
+        <input id="title" name="title" type="text" value="{{ post.title if post else '' }}" required />
+      </div>
+      <div class="field">
+        <label for="category">category</label>
+        <input id="category" name="category" type="text" value="{{ post.category if post else 'build log' }}" />
+      </div>
+      <div class="field">
+        <label for="body">body</label>
+        <textarea id="body" name="body" required>{{ post.body if post else '' }}</textarea>
+      </div>
+      <div class="field">
+        <label for="image">image</label>
+        <input id="image" name="image" type="file" accept="image/*" />
+        <img id="imagePreview" class="image-preview" alt="Selected image preview" />
+      </div>
+      {% if post and post.image_filename %}
+        <img class="post-image" src="{{ url_for('uploaded_file', filename=post.image_filename) }}" alt="" />
+      {% endif %}
+      <label class="row" style="margin: 10px 0;">
+        <input name="published" type="checkbox" {% if not post or post.published %}checked{% endif %} />
+        published
+      </label>
+      <div class="row">
+        <button class="btn primary" type="submit">save</button>
+        <a class="btn" href="{{ url_for('admin') }}">cancel</a>
+      </div>
+    </form>
+  </section>
+
+  <script>
+    const imageInput = document.getElementById("image");
+    const imagePreview = document.getElementById("imagePreview");
+
+    imageInput.addEventListener("change", () => {
+      const file = imageInput.files[0];
+      if (!file) {
+        imagePreview.removeAttribute("src");
+        imagePreview.classList.remove("visible");
+        return;
+      }
+
+      imagePreview.src = URL.createObjectURL(file);
+      imagePreview.classList.add("visible");
+    });
+  </script>
+{% endblock %}

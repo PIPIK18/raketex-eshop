@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RAKETEX - Broadcast Dark</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;600&display=swap");
+    :root { --bg:#06080b; --ink:#f4f5f7; --muted:#97a2ad; --line:#26303d; --accent:#e6672f; --panel:#0e141b; }
+    * { box-sizing:border-box; }
+    body { margin:0; background: linear-gradient(180deg,#101722 0%,#06080b 40%); color:var(--ink); font-family:"Inter",sans-serif; }
+    .shell { max-width:1240px; margin:0 auto; padding:18px; }
+    .bar { display:flex; justify-content:space-between; align-items:center; border:1px solid var(--line); padding:10px 14px; background:#0a0f15; }
+    .brand { margin:0; font-family:"Barlow Condensed",sans-serif; letter-spacing:1.2px; font-size:38px; }
+    .links { display:flex; gap:12px; flex-wrap:wrap; }
+    .links a { color:var(--ink); text-decoration:none; font-weight:600; font-size:14px; }
+    .hero { margin-top:10px; border:1px solid var(--line); display:grid; grid-template-columns:1.2fr 1fr; }
+    .hero-media { min-height:420px; background: linear-gradient(0deg, rgba(7,10,14,.72), rgba(7,10,14,.18)), url("../assets/design-images/falcon-heavy-viasat.jpg") center/cover; }
+    .hero-copy { background:var(--panel); padding:24px; border-left:1px solid var(--line); display:flex; flex-direction:column; justify-content:center; }
+    .kicker { color:#ffb28c; text-transform:uppercase; font-size:12px; letter-spacing:.8px; }
+    .hero-copy h2 { margin:8px 0 10px; font-size: clamp(28px,4vw,46px); line-height:1; font-family:"Barlow Condensed",sans-serif; }
+    .hero-copy p { color:#ced5dd; }
+    .btn { display:inline-block; text-decoration:none; color:#fff; border:1px solid var(--accent); padding:9px 12px; margin-top:10px; width:fit-content; font-weight:700; }
+    .sections { margin-top:12px; display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .panel { border:1px solid var(--line); background:var(--panel); padding:12px; }
+    .panel h3 { margin:0 0 10px; font-family:"Barlow Condensed",sans-serif; font-size:28px; }
+    .story { display:grid; grid-template-columns:120px 1fr; gap:8px; margin-bottom:9px; }
+    .story:last-child { margin-bottom:0; }
+    .simg { border:1px solid #2c3745; min-height:84px; background-size:cover; background-position:center; }
+    .story p { margin:0; color:var(--muted); font-size:13px; }
+    .shop { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; }
+    .card { border:1px solid #2c3745; padding:8px; }
+    .card .img { height:96px; border:1px solid #2e3947; background-size:cover; background-position:center; margin-bottom:6px; }
+    .price { color:#ffbc96; margin:5px 0 7px; font-weight:700; }
+    @media (max-width: 960px) { .hero { grid-template-columns:1fr; } .hero-copy { border-left:0; border-top:1px solid var(--line); } .sections { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="bar">
+      <h1 class="brand">RAKETEX</h1>
+      <nav class="links">
+        <a href="#">home</a>
+        <a href="#">news</a>
+        <a href="#">missions</a>
+        <a href="#">shop</a>
+        <a href="#">admin</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div class="hero-media"></div>
+      <div class="hero-copy">
+        <span class="kicker">feature</span>
+        <h2>Launch Coverage + Storefront In One Screen</h2>
+        <p>A stronger editorial/commercial split where stories pull users in, and products convert on the same page.</p>
+        <a class="btn" href="#">See Mission Models</a>
+      </div>
+    </section>
+
+    <section class="sections">
+      <section class="panel">
+        <h3>Top Stories</h3>
+        <article class="story">
+          <div class="simg" style="background-image:url('../assets/design-images/falcon-heavy-night.jpg');"></div>
+          <div><strong>Why plume geometry changes with atmospheric layers</strong><p>2 min read</p></div>
+        </article>
+        <article class="story">
+          <div class="simg" style="background-image:url('../assets/design-images/falcon-heavy-liftoff.jpg');"></div>
+          <div><strong>How boosters are reused and inspected after landing</strong><p>6 min read</p></div>
+        </article>
+      </section>
+      <section class="panel">
+        <h3>Drop Shop</h3>
+        <div class="shop">
+          <article class="card"><div class="img" style="background-image:url('../assets/design-images/falcon-heavy-viasat.jpg');"></div><strong>Falcon Heavy 1:200</strong><p class="price">2 990 CZK</p></article>
+          <article class="card"><div class="img" style="background-image:url('../assets/design-images/falcon-heavy-vertical.jpg');"></div><strong>Lift-Off Poster</strong><p class="price">890 CZK</p></article>
+          <article class="card"><div class="img" style="background-image:url('../assets/design-images/falcon-heavy-night.jpg');"></div><strong>Launch Set</strong><p class="price">3 990 CZK</p></article>
+          <article class="card"><div class="img" style="background-image:url('../assets/design-images/falcon-heavy-liftoff.jpg');"></div><strong>Mission Patch Kit</strong><p class="price">590 CZK</p></article>
+        </div>
+      </section>
+    </section>
+  </main>
+</body>
+</html>

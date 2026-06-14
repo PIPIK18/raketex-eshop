@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RAKETEX - Bento Lab</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Sora:wght@600;800&display=swap");
+    :root { --bg:#eef4f6; --ink:#102024; --line:#19343b; --accent:#0d8b99; --accent2:#f28f1d; --panel:#ffffff; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:
+      linear-gradient(160deg, #f9fdff 0%, #eaf2f5 65%);
+      color:var(--ink); font-family:"Space Grotesk",sans-serif; }
+    .wrap { max-width:1180px; margin:20px auto; padding:0 14px; }
+    .head { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:12px; }
+    .logo { margin:0; font-family:"Sora",sans-serif; font-size: clamp(32px, 7vw, 72px); }
+    .menu { display:flex; gap:8px; flex-wrap:wrap; }
+    .menu a { text-decoration:none; color:var(--ink); border:2px solid var(--line); padding:8px 12px; font-weight:700; background:#fff; }
+    .menu a.active { background:var(--ink); color:#fff; }
+    .bento { display:grid; grid-template-columns:1.2fr 1fr 1fr; grid-template-rows:220px 220px; gap:12px; }
+    .card { border:2px solid var(--line); border-radius:16px; background:var(--panel); padding:16px; overflow:hidden; position:relative; }
+    .hero { grid-column:1/3; background:linear-gradient(130deg,#dff6f8,#fff); }
+    .hero h2 { margin:0; font-family:"Sora",sans-serif; font-size:34px; line-height:1.05; }
+    .hero p { max-width:460px; }
+    .pill { display:inline-block; background:var(--accent); color:#fff; padding:6px 10px; border-radius:999px; font-size:12px; font-weight:700; }
+    .drop { background:linear-gradient(140deg,#fff6e8,#fff); }
+    .drop strong { color:#8f4f05; }
+    .stat { display:grid; place-items:center; text-align:center; background:linear-gradient(140deg,#e9f8f1,#fff); }
+    .stat .n { font-size:44px; font-weight:800; margin:0; color:#157650; }
+    .products { grid-column:1/4; display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+    .product { border:2px solid var(--line); border-radius:14px; background:#fff; padding:10px; }
+    .thumb { height:110px; border-radius:10px; background:linear-gradient(135deg,#d6ecf0,#fff); border:1px solid #9cc6ce; margin-bottom:8px; }
+    .price { margin:4px 0 8px; color:#0c6b75; font-weight:700; }
+    .btn { display:inline-block; text-decoration:none; color:var(--ink); border:1px solid var(--line); padding:6px 9px; font-weight:700; }
+    @media (max-width: 980px){ .bento { grid-template-columns:1fr; grid-template-rows:auto; } .hero { grid-column:auto; } .products { grid-template-columns:1fr 1fr; grid-column:auto; } }
+    @media (max-width: 560px){ .products { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header class="head">
+      <h1 class="logo">RAKETEX</h1>
+      <nav class="menu">
+        <a class="active" href="#">shop</a>
+        <a href="#">posts</a>
+        <a href="#">drops</a>
+        <a href="#">admin</a>
+      </nav>
+    </header>
+    <section class="bento">
+      <article class="card hero">
+        <span class="pill">Curated Weekly</span>
+        <h2>Model Spacecraft<br />For Serious Collectors</h2>
+        <p>Fast scanning layout with spotlight cards for launches, posts, and product releases.</p>
+      </article>
+      <article class="card drop">
+        <h3>Next Drop</h3>
+        <p><strong>Tuesday 19:00</strong><br />Shuttle Orbiter Series</p>
+      </article>
+      <article class="card stat">
+        <p class="n">124</p>
+        <p>items in stock</p>
+      </article>
+      <section class="products">
+        <article class="product"><div class="thumb"></div><strong>Falcon 9 Block 5</strong><p class="price">2 290 CZK</p><a class="btn" href="#">add</a></article>
+        <article class="product"><div class="thumb"></div><strong>Mercury Capsule</strong><p class="price">1 690 CZK</p><a class="btn" href="#">add</a></article>
+        <article class="product"><div class="thumb"></div><strong>Saturn IB</strong><p class="price">2 990 CZK</p><a class="btn" href="#">add</a></article>
+        <article class="product"><div class="thumb"></div><strong>ISS Module Pack</strong><p class="price">3 190 CZK</p><a class="btn" href="#">add</a></article>
+      </section>
+    </section>
+  </main>
+</body>
+</html>

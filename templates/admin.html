@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Admin - RAKETEX{% endblock %}
+
+{% block body %}
+  <section class="panel">
+    <div class="row" style="justify-content: space-between;">
+      <h2>Manage Posts</h2>
+      <a class="btn primary" href="{{ url_for('new_post') }}">new post</a>
+    </div>
+
+    {% if posts %}
+      <div class="grid">
+        {% for post in posts %}
+          <article class="admin-card">
+            {% if post.image_filename %}
+              <img class="post-image" src="{{ url_for('uploaded_file', filename=post.image_filename) }}" alt="" />
+            {% else %}
+              <div class="post-image"></div>
+            {% endif %}
+            <p class="muted">{{ post.category }} | {{ "published" if post.published else "draft" }}</p>
+            <h3>{{ post.title }}</h3>
+            <p>{{ post.updated_at[:10] }}</p>
+            <div class="row admin-card-actions">
+              <a class="btn" href="{{ url_for('post_detail', post_id=post.id) }}">view</a>
+              <a class="btn primary" href="{{ url_for('edit_post', post_id=post.id) }}">edit</a>
+              <form action="{{ url_for('delete_post', post_id=post.id) }}" method="post" style="margin:0;">
+                <button class="btn" type="submit">delete</button>
+              </form>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="muted">No posts yet.</p>
+    {% endif %}
+  </section>
+{% endblock %}

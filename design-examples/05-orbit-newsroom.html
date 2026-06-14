@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RAKETEX - Orbit Newsroom</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Inter:wght@400;500;700&display=swap");
+    :root { --bg:#07090d; --ink:#f4f6f8; --muted:#9aa3ad; --line:#2a313b; --accent:#f3742f; --panel:#11161d; }
+    * { box-sizing:border-box; }
+    body { margin:0; background: radial-gradient(circle at 15% 15%, #1a2432 0%, #07090d 45%); color:var(--ink); font-family:"Inter",sans-serif; }
+    .site { max-width:1220px; margin:0 auto; padding:16px; }
+    .top { display:flex; justify-content:space-between; align-items:center; border:1px solid var(--line); background:#0a0f15; padding:10px 14px; }
+    .logo { font-family:"Rajdhani",sans-serif; font-size:32px; letter-spacing:2px; margin:0; }
+    .top nav { display:flex; gap:10px; }
+    .top a { text-decoration:none; color:var(--ink); font-size:14px; font-weight:600; border:1px solid var(--line); padding:7px 10px; }
+    .top a.active { border-color:var(--accent); color:#fff; }
+    .hero { margin-top:10px; border:1px solid var(--line); min-height:420px; position:relative; display:flex; align-items:flex-end; overflow:hidden; }
+    .hero::before { content:""; position:absolute; inset:0; background: linear-gradient(180deg, rgba(7,9,13,.25), rgba(7,9,13,.92)), url("../assets/design-images/falcon-heavy-night.jpg") center/cover; }
+    .hero .content { position:relative; padding:24px; max-width:760px; }
+    .label { display:inline-block; padding:4px 8px; font-size:12px; letter-spacing:.6px; text-transform:uppercase; border:1px solid #f5a16f; color:#ffc7a3; }
+    .hero h2 { font-size: clamp(30px, 5vw, 64px); margin:10px 0 8px; font-family:"Rajdhani",sans-serif; line-height:1; }
+    .hero p { margin:0 0 14px; color:#d5dbe0; max-width:640px; }
+    .cta { text-decoration:none; color:#fff; border:1px solid var(--accent); background:rgba(243,116,47,.18); padding:9px 12px; font-weight:700; }
+    .grid { margin-top:12px; display:grid; gap:12px; grid-template-columns:1.5fr 1fr; }
+    .panel { border:1px solid var(--line); background:var(--panel); padding:12px; }
+    .head { margin:0 0 10px; font-family:"Rajdhani",sans-serif; letter-spacing:.8px; font-size:24px; }
+    .article { display:grid; grid-template-columns:150px 1fr; gap:10px; margin-bottom:10px; border-bottom:1px solid #222a34; padding-bottom:10px; }
+    .article:last-child { margin-bottom:0; border-bottom:0; padding-bottom:0; }
+    .thumb { border:1px solid #2a3441; min-height:100px; background-size:cover; background-position:center; }
+    .meta { color:var(--muted); font-size:12px; margin:6px 0 0; }
+    .launch { border:1px solid #263241; padding:10px; margin-bottom:8px; background:#0b1119; }
+    .launch:last-child { margin-bottom:0; }
+    .launch .when { color:#ffb486; font-size:13px; font-weight:700; }
+    .launch h4 { margin:4px 0 4px; }
+    @media (max-width: 950px) { .grid { grid-template-columns:1fr; } .article { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <main class="site">
+    <header class="top">
+      <h1 class="logo">RAKETEX</h1>
+      <nav>
+        <a class="active" href="#">home</a>
+        <a href="#">launches</a>
+        <a href="#">articles</a>
+        <a href="#">shop</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div class="content">
+        <span class="label">mission briefing</span>
+        <h2>The Next Era Of Model Launch Collectibles</h2>
+        <p>Daily launch news meets premium model sales. Bold media-first layout inspired by modern space journalism sites.</p>
+        <a class="cta" href="#">Explore New Releases</a>
+      </div>
+    </section>
+
+    <section class="grid">
+      <section class="panel">
+        <h3 class="head">Latest Coverage</h3>
+        <article class="article">
+          <div class="thumb" style="background-image:url('../assets/design-images/falcon-heavy-viasat.jpg');"></div>
+          <div>
+            <h4>Falcon Heavy Night Flight Debrief</h4>
+            <p>What made this trajectory unique and why the plume looked different from previous flights.</p>
+            <p class="meta">5 min read • by Raketex Team</p>
+          </div>
+        </article>
+        <article class="article">
+          <div class="thumb" style="background-image:url('../assets/design-images/falcon-heavy-liftoff.jpg');"></div>
+          <div>
+            <h4>Collector’s Guide: Choosing 1:144 vs 1:72</h4>
+            <p>Quick decision framework for scale, detail, and display space.</p>
+            <p class="meta">4 min read • by Raketex Team</p>
+          </div>
+        </article>
+      </section>
+
+      <aside class="panel">
+        <h3 class="head">Upcoming Launches</h3>
+        <article class="launch">
+          <p class="when">MAY 18 • 21:30 UTC</p>
+          <h4>Falcon 9 • Starlink</h4>
+          <p class="meta">Status: Go for fueling</p>
+        </article>
+        <article class="launch">
+          <p class="when">MAY 26 • 13:10 UTC</p>
+          <h4>Electron • Dedicated Mission</h4>
+          <p class="meta">Status: Waiting weather window</p>
+        </article>
+        <article class="launch">
+          <p class="when">JUNE 02 • 02:50 UTC</p>
+          <h4>Falcon Heavy • ComSat</h4>
+          <p class="meta">Status: Payload integrated</p>
+        </article>
+      </aside>
+    </section>
+  </main>
+</body>
+</html>
