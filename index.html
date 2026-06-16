@@ -1388,6 +1388,11 @@
       await refreshProductsAndShop();
       await renderOrders();
       renderCart();
+
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("admin") === "1" || window.location.hash === "#admin" || window.location.pathname.startsWith("/admin")) {
+        adminFlyout.classList.remove("hidden");
+      }
     }
 
     bootstrap();
