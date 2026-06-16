@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RAKETEX - Build Log</title>
+  <title>Admin Login - RAKETEX</title>
   <style>
     @import url("https://fonts.googleapis.com/css2?family=Teko:wght@500;700&family=Inter:wght@400;500;700&display=swap");
 
@@ -263,8 +263,8 @@
       <a class="logo" href="index.html">RAKETEX</a>
       <nav class="menu">
         
-          <a class="active" href="index.html">posts</a>
-          <a class="" href="admin-login.html">admin</a>
+          <a class="" href="index.html">posts</a>
+          <a class="active" href="admin-login.html">admin</a>
         
       </nav>
     </header>
@@ -274,23 +274,33 @@
     
 
     
-  <section class="blog-head">
-    <form method="get">
-      <input name="q" type="text" value="" placeholder="search posts" />
-    </form>
-  </section>
-
-  <section class="blog-list">
-    
-      <div class="blog-entry">
-        <div>
-          <h2>No posts yet</h2>
-          <p class="blog-excerpt">Create the first post from the admin page.</p>
+  <div class="login-wrap">
+    <section class="panel login-panel">
+      <h2>Admin Login</h2>
+      <form id="staticLoginForm" method="post">
+        <div class="field">
+          <label for="username">username</label>
+          <input id="username" name="username" type="text" autocomplete="username" required />
         </div>
-      </div>
-    
-  </section>
+        <div class="field">
+          <label for="password">password</label>
+          <input id="password" name="password" type="password" autocomplete="current-password" required />
+        </div>
+        <button class="btn primary" type="submit">sign in</button>
+        <p id="staticLoginNote" class="muted" style="margin-top: 10px;"></p>
+      </form>
+    </section>
+  </div>
 
   </main>
+  <script>
+    const staticLoginForm = document.getElementById("staticLoginForm");
+    const staticLoginNote = document.getElementById("staticLoginNote");
+
+    staticLoginForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      staticLoginNote.textContent = "Admin editing needs the Flask server. Open http://127.0.0.1:5000/admin/login";
+    });
+  </script>
 </body>
 </html>
