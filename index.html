@@ -1,34 +1,39 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RAKETEX - Build Log</title>
+  <title>RAKETEX</title>
   <style>
-    @import url("https://fonts.googleapis.com/css2?family=Teko:wght@500;700&family=Inter:wght@400;500;700&display=swap");
+    @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap");
 
     :root {
-      --bg: #090d13;
-      --ink: #f5f7fa;
-      --muted: #9aa3b0;
-      --line: #273344;
-      --panel: #101824;
-      --panel-2: #0d1520;
-      --accent: #f88c3d;
-      --good: #62d8a0;
-      --warn: #ff7373;
+      --bg: #ffffff;
+      --surface: #f7f7f7;
+      --ink: #111111;
+      --line: #d5d5d5;
+      --line-strong: #111111;
+      --ok: #0c6a36;
+      --warn: #8a1111;
     }
 
-    * { box-sizing: border-box; }
-    body {
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
       margin: 0;
+      min-height: 100%;
       background: #05070b;
       color: var(--ink);
-      font-family: "Inter", sans-serif;
-      min-height: 100vh;
+      font-family: "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+    }
+
+    body {
       position: relative;
       overflow-x: hidden;
     }
+
     body::before,
     body::after {
       content: "";
@@ -37,260 +42,1355 @@
       z-index: 0;
       pointer-events: none;
     }
+
     body::before {
-      background: url("/assets/images/raketex-background.jpg") center center / cover no-repeat;
-      filter: brightness(.72) saturate(.95);
+      background: url("assets/images/raketex-background.jpg") center center / cover no-repeat;
+      filter: brightness(0.72) saturate(0.95);
     }
+
     body::after {
       display: none;
     }
 
-    a { color: inherit; }
-    button, input, textarea { font: inherit; }
-    .page {
-      max-width: 1120px;
-      margin: 0 auto;
-      padding: 18px;
-      background: transparent;
+    .site {
       min-height: 100vh;
+      padding: clamp(14px, 3vw, 34px);
       position: relative;
       z-index: 1;
-      box-shadow: none;
+      display: flex;
+      justify-content: center;
     }
-    .top { margin-top: 18px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; }
-    .logo { grid-column: 2; margin: 0; font-family: "Teko", sans-serif; letter-spacing: 1px; font-size: 92px; line-height: .78; text-decoration: none; text-align: center; }
-    .menu { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
-    .btn, .menu a, .menu button {
-      border: 0;
-      background: transparent;
-      color: var(--ink);
-      padding: 12px 24px;
+
+    .wrap {
+      width: min(980px, 100%);
+      margin: 0;
+      border: 1px solid var(--line-strong);
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: 0 18px 42px rgba(0, 0, 0, 0.22);
+    }
+
+    .topbar {
+      border-bottom: 5px solid var(--line-strong);
+      padding: 28px 24px 24px;
+      background: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    .brand {
+      margin: 0;
+      font-size: clamp(48px, 8vw, 120px);
+      line-height: 1;
+      text-transform: uppercase;
+      letter-spacing: 5px;
+      font-weight: 900;
+      color: #000;
+      text-align: center;
+      font-family: "Orbitron", "Arial Black", "Segoe UI", sans-serif;
+      text-shadow: 0 1px 0 #fff, 0 4px 14px rgba(0, 0, 0, 0.12);
+    }
+
+    .window-nav {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0;
+      border-bottom: 5px solid var(--line-strong);
+      background: #fff;
+    }
+
+    .window-btn {
+      border-top: 1px solid #222;
+      border-bottom: 1px solid #222;
+      border-left: 5px solid #222;
+      border-right: 5px solid #222;
+      background: #fff;
+      color: #111;
+      padding: 13px 16px;
+      font-size: 15px;
       font-weight: 700;
-      text-decoration: none;
       text-transform: lowercase;
       cursor: pointer;
-      position: relative;
-      clip-path: polygon(13px 0, calc(100% - 13px) 0, 100% 50%, calc(100% - 13px) 100%, 13px 100%, 0 50%);
-      transition: background .16s ease, color .16s ease;
-    }
-    .btn::before, .menu a::before, .menu button::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      z-index: -2;
-      background: var(--line);
-      clip-path: inherit;
-    }
-    .btn::after, .menu a::after, .menu button::after {
-      content: "";
-      position: absolute;
-      inset: 1px;
-      z-index: -1;
-      background: #0b121c;
-      clip-path: inherit;
-    }
-    .btn.primary, .menu .active { color: #fff; }
-    .btn.primary::before, .menu .active::before, .menu a:hover::before, .menu button:hover::before { background: var(--accent); }
-    .btn.primary::after, .menu .active::after { background: rgba(248, 140, 61, .22); }
-    .btn:hover, .menu a:hover, .menu button:hover { color: #fff; }
-    .hero {
-      margin-top: 10px;
-      border: 1px solid var(--line);
-      min-height: 260px;
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      align-items: flex-end;
-    }
-    .hero::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(100deg, rgba(6, 9, 14, .94) 18%, rgba(6, 9, 14, .38) 68%), url("/assets/design-images/falcon-heavy-liftoff.jpg") center/cover;
-    }
-    .hero-content { position: relative; padding: 26px; max-width: 720px; }
-    .hero h1 { margin: 0 0 10px; font-family: "Teko", sans-serif; font-size: 76px; line-height: .88; letter-spacing: 0; }
-    .hero p { margin: 0; color: #d8e0e8; max-width: 620px; }
-    .panel { border: 1px solid var(--line); background: var(--panel); padding: 12px; margin-top: 12px; }
-    .panel h2, .panel h3 { margin: 0 0 10px; font-family: "Teko", sans-serif; font-size: 34px; line-height: 1; letter-spacing: 0; }
-    .blog-head { margin-top: 18px; display: flex; justify-content: flex-end; }
-    .blog-head form { width: min(320px, 100%); }
-    .blog-title { margin: 0; font-family: "Teko", sans-serif; font-size: 58px; line-height: .9; letter-spacing: 0; }
-    .blog-list { border-top: 1px solid var(--line); margin-top: 12px; }
-    .blog-entry {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 150px;
-      gap: 16px;
-      padding: 18px 28px;
-      margin: 12px 0;
-      position: relative;
-      clip-path: polygon(24px 0, calc(100% - 24px) 0, 100% 50%, calc(100% - 24px) 100%, 24px 100%, 0 50%);
-      background: rgba(16, 24, 36, .92);
-      color: var(--ink);
-      text-decoration: none;
-      cursor: pointer;
-      transition: transform .16s ease, color .16s ease;
-    }
-    .blog-entry::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      z-index: -2;
-      background: #344255;
-      clip-path: inherit;
-    }
-    .blog-entry::after {
-      content: "";
-      position: absolute;
-      inset: 1px;
-      z-index: -1;
-      background: rgba(13, 21, 32, .96);
-      clip-path: inherit;
-    }
-    .blog-entry:hover { transform: translateX(3px); }
-    .blog-entry:hover h2 { color: #ffc59e; }
-    .blog-entry h2 { margin: 0 0 6px; font-family: "Teko", sans-serif; font-size: 36px; line-height: .95; letter-spacing: 0; }
-    .blog-entry h2 a { text-decoration: none; color: var(--ink); }
-    .blog-entry h2 a:hover { color: #ffc59e; }
-    .blog-meta { color: #ffc59e; font-size: 13px; margin: 0 0 10px; }
-    .blog-excerpt { margin: 0; line-height: 1.55; color: #d9e0e8; }
-    .blog-thumb { width: 150px; aspect-ratio: 4 / 3; object-fit: contain; border: 1px solid #304055; background: #0a1018; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
-    .card {
-      background: var(--panel-2);
-      padding: 14px 22px;
-      position: relative;
-      clip-path: polygon(18px 0, calc(100% - 18px) 0, 100% 50%, calc(100% - 18px) 100%, 18px 100%, 0 50%);
-    }
-    .card::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      z-index: -2;
-      background: #2d3a4d;
-      clip-path: inherit;
-    }
-    .card::after {
-      content: "";
-      position: absolute;
-      inset: 1px;
-      z-index: -1;
-      background: var(--panel-2);
-      clip-path: inherit;
-    }
-    .card h3 { font-size: 28px; margin-bottom: 6px; }
-    .muted { color: var(--muted); font-size: 13px; margin: 4px 0; }
-    .post-image { width: 100%; max-height: 640px; object-fit: contain; border: 1px solid #304055; margin-bottom: 8px; background: #0a1018; }
-    .image-preview { display: none; width: 100%; max-height: 360px; object-fit: contain; border: 1px solid #304055; margin: 8px 0 0; background: #0a1018; }
-    .image-preview.visible { display: block; }
-    .flash {
-      position: fixed;
-      top: 24px;
-      right: 24px;
-      z-index: 50;
-      border: 1px solid var(--line);
-      padding: 10px 16px;
-      min-width: 180px;
-      background: #0d1520;
-      box-shadow: 0 16px 36px rgba(0, 0, 0, .45);
-      animation: toastSlide 2.4s ease forwards;
-      clip-path: polygon(12px 0, calc(100% - 12px) 0, 100% 50%, calc(100% - 12px) 100%, 12px 100%, 0 50%);
-    }
-    .flash.ok { color: var(--good); }
-    .flash.warn { color: var(--warn); }
-    @keyframes toastSlide {
-      0% { transform: translateX(130%); opacity: 0; }
-      14% { transform: translateX(0); opacity: 1; }
-      78% { transform: translateX(0); opacity: 1; }
-      100% { transform: translateX(130%); opacity: 0; }
-    }
-    .field { display: grid; gap: 5px; margin-bottom: 10px; }
-    .field label { color: var(--muted); font-size: 12px; font-weight: 700; text-transform: lowercase; }
-    input, textarea {
       width: 100%;
-      border: 1px solid #35445a;
-      background: #080d14;
-      color: var(--ink);
-      padding: 9px;
     }
-    input[type="file"], input[type="checkbox"] { width: auto; }
-    textarea { min-height: 160px; resize: vertical; }
-    .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-    .post-body { white-space: pre-wrap; line-height: 1.65; color: #d9e0e8; }
-    .admin-card {
-      min-height: 560px;
-      display: flex;
-      flex-direction: column;
-      border: 1px solid #2d3a4d;
-      background: var(--panel-2);
-      padding: 10px;
-      clip-path: none;
-    }
-    .admin-card::before, .admin-card::after { display: none; }
-    .admin-card .post-image {
-      height: 280px;
-      object-fit: contain;
-      margin-bottom: 12px;
-    }
-    .admin-card-actions { margin-top: auto; }
-    .login-wrap {
-      min-height: 58vh;
-      display: grid;
-      place-items: center;
-    }
-    .login-panel {
-      width: min(560px, 100%);
-      padding: 28px;
-    }
-    .login-panel h2 { font-size: 46px; }
-    .login-panel input { min-height: 54px; font-size: 18px; }
-    .login-panel .btn { font-size: 20px; }
 
-    @media (max-width: 780px) {
-      .top { grid-template-columns: 1fr; }
-      .logo { grid-column: auto; font-size: 72px; }
-      .menu { justify-content: flex-start; }
-      .hero h1 { font-size: 54px; }
-      .blog-head { grid-template-columns: 1fr; }
-      .blog-entry { grid-template-columns: 1fr; }
-      .blog-thumb { width: 100%; }
+    .window-btn + .window-btn {
+      border-left-width: 0;
+    }
+
+    .window-btn:hover {
+      background: #f0f0f0;
+    }
+
+    .window-btn.active {
+      background: #111;
+      color: #fff;
+      border-color: #111;
+    }
+
+    .admin-logo-btn {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 36px;
+      height: 36px;
+      border: 1px solid #111;
+      border-radius: 3px;
+      background: #fff;
+      padding: 0;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .admin-logo-btn::before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #111;
+      position: absolute;
+      top: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .admin-logo-btn::after {
+      content: "";
+      width: 18px;
+      height: 10px;
+      border-radius: 10px 10px 3px 3px;
+      background: #111;
+      position: absolute;
+      bottom: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .admin-flyout {
+      position: fixed;
+      top: 84px;
+      right: 16px;
+      width: min(400px, calc(100vw - 32px));
+      max-height: calc(100vh - 100px);
+      overflow: auto;
+      border: 2px solid #111;
+      background: #fff;
+      padding: 10px;
+      z-index: 1000;
+      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.18);
+    }
+
+    .windows {
+      background: var(--surface);
+      padding: 18px;
+    }
+
+    .window {
+      display: none;
+      border: 1px solid var(--line);
+      background: #fff;
+      min-height: 280px;
+      padding: 16px;
+    }
+
+    .window.active {
+      display: block;
+      animation: reveal 180ms ease;
+    }
+
+    .panel-title {
+      margin: 0 0 12px;
+      font-size: 30px;
+      text-transform: lowercase;
+      font-weight: 800;
+      line-height: 1;
+      color: #111;
+    }
+
+    .card {
+      border: 1px solid #111;
+      padding: 12px;
+      margin: 10px 0;
+      background: #fff;
+    }
+
+    .panel-label {
+      margin: 0 0 8px;
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: lowercase;
+    }
+
+    .auth-row,
+    .admin-actions,
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .field {
+      display: grid;
+      gap: 4px;
+      flex: 1 1 150px;
+    }
+
+    .field-label {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: lowercase;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    input[type="number"],
+    input[type="email"],
+    textarea {
+      width: 100%;
+      border: 1px solid #222;
+      padding: 10px;
+      font: inherit;
+      color: #111;
+      background: #fff;
+    }
+
+    textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    .btn {
+      border: 1px solid #222;
+      background: #fff;
+      color: #111;
+      padding: 9px 12px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: lowercase;
+    }
+
+    .btn:hover {
+      background: #f0f0f0;
+    }
+
+    .btn.primary {
+      background: #111;
+      color: #fff;
+      border-color: #111;
+    }
+
+    .status {
+      margin: 8px 0 0;
+      font-size: 14px;
+      min-height: 18px;
+    }
+
+    .status.ok {
+      color: var(--ok);
+    }
+
+    .status.warn {
+      color: var(--warn);
+    }
+
+    .post-list,
+    .product-list,
+    .cart-list,
+    .order-list,
+    .admin-list {
+      list-style: none;
+      margin: 10px 0 0;
+      padding: 0;
+      display: grid;
+      gap: 8px;
+    }
+
+    .post-item,
+    .product-item,
+    .cart-item,
+    .order-item,
+    .admin-item {
+      border: 1px solid #222;
+      padding: 10px;
+      background: #fff;
+    }
+
+    .post-text,
+    .product-name,
+    .cart-name {
+      margin: 0 0 6px;
+      font-weight: 700;
+    }
+
+    .post-meta,
+    .muted {
+      margin: 0;
+      font-size: 12px;
+      color: #444;
+    }
+
+    .post-image,
+    .product-image {
+      display: block;
+      width: 100%;
+      max-width: 460px;
+      border: 1px solid #222;
+      margin: 8px 0 6px;
+      object-fit: cover;
+      max-height: 260px;
+    }
+
+    .shop-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: 2fr 1fr;
+    }
+
+    .product-grid {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+
+    .product-card {
+      border: 1px solid #111;
+      padding: 10px;
+      background: #fff;
+      display: grid;
+      gap: 6px;
+    }
+
+    .product-price {
+      margin: 0;
+      font-weight: 800;
+    }
+
+    .stock-ok {
+      color: var(--ok);
+      font-size: 13px;
+      margin: 0;
+    }
+
+    .stock-low {
+      color: #8a5a11;
+      font-size: 13px;
+      margin: 0;
+    }
+
+    .stock-out {
+      color: var(--warn);
+      font-size: 13px;
+      margin: 0;
+    }
+
+    .checkout-fields {
+      display: grid;
+      gap: 8px;
+    }
+
+    .order-total {
+      margin: 8px 0 0;
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @keyframes reveal {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 900px) {
+      .shop-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .window-btn {
+        min-width: 0;
+      }
+
+      .brand {
+        font-size: clamp(40px, 12vw, 68px);
+      }
+
+      .admin-flyout {
+        right: 8px;
+        top: 72px;
+        width: calc(100vw - 16px);
+      }
     }
   </style>
 </head>
 <body>
-  <main class="page">
-    <header class="top">
-      <a class="logo" href="/">RAKETEX</a>
-      <nav class="menu">
-        
-          <a class="active" href="/">posts</a>
-          <a class="" href="/admin/login">admin</a>
-        
+  <main class="site">
+    <section class="wrap">
+      <header class="topbar">
+        <button id="adminToggleBtn" class="admin-logo-btn" type="button" aria-label="Open admin panel" title="Admin"></button>
+        <h1 class="brand">RAKETEX</h1>
+      </header>
+
+      <nav class="window-nav" aria-label="Window navigation">
+        <button class="window-btn active" data-window="posts" type="button">posts</button>
+        <button class="window-btn" data-window="shop" type="button">shop</button>
+        <button class="window-btn" data-window="help" type="button">help</button>
       </nav>
-    </header>
 
-    
-      
-    
+      <section class="windows" aria-live="polite">
+        <aside id="adminFlyout" class="admin-flyout hidden" aria-label="Admin panel">
+          <div class="admin-actions" style="justify-content: space-between; margin-bottom: 6px;">
+            <p class="panel-label" style="margin: 0;">admin mode</p>
+            <button id="closeAdminBtn" class="btn" type="button">close</button>
+          </div>
 
-    
-  <section class="blog-head">
-    <form method="get">
-      <input name="q" type="text" value="" placeholder="search posts" />
-    </form>
-  </section>
+          <section class="card" id="loginPanel">
+            <p class="panel-label">admin sign in</p>
+            <div class="auth-row">
+              <input id="adminUser" type="text" placeholder="username" autocomplete="username" />
+              <input id="adminPass" type="password" placeholder="password" autocomplete="current-password" />
+            </div>
+            <div class="admin-actions" style="margin-top: 8px;">
+              <button id="loginBtn" class="btn primary" type="button">sign in</button>
+            </div>
+            <p id="loginStatus" class="status"></p>
+          </section>
 
-  <section class="blog-list">
-    
-      <div class="blog-entry">
-        <div>
-          <h2>No posts yet</h2>
-          <p class="blog-excerpt">Create the first post from the admin page.</p>
-        </div>
-      </div>
-    
-  </section>
+          <section class="card hidden" id="adminPanel">
+            <p class="panel-label">create post</p>
+            <textarea id="postInput" placeholder="Write a new post message..."></textarea>
+            <div style="margin-top: 8px;">
+              <input id="postImageInput" type="file" accept="image/*" />
+            </div>
+            <div class="admin-actions" style="margin-top: 8px;">
+              <button id="savePostBtn" class="btn primary" type="button">publish post</button>
+            </div>
+            <p id="saveStatus" class="status"></p>
 
+            <hr style="margin: 12px 0; border: 0; border-top: 1px solid #ddd;" />
+
+            <p class="panel-label">create product</p>
+            <div class="row">
+              <div class="field">
+                <label class="field-label" for="prodName">name</label>
+                <input id="prodName" type="text" placeholder="Falcon Mini Model" />
+              </div>
+              <div class="field">
+                <label class="field-label" for="prodSku">sku</label>
+                <input id="prodSku" type="text" placeholder="RM-001" />
+              </div>
+            </div>
+            <div class="row">
+              <div class="field">
+                <label class="field-label" for="prodPrice">price (CZK)</label>
+                <input id="prodPrice" type="number" min="0" step="0.01" placeholder="999" />
+              </div>
+              <div class="field">
+                <label class="field-label" for="prodStock">stock</label>
+                <input id="prodStock" type="number" min="0" step="1" placeholder="10" />
+              </div>
+            </div>
+            <div class="field">
+              <label class="field-label" for="prodDesc">description</label>
+              <textarea id="prodDesc" placeholder="Short product description"></textarea>
+            </div>
+            <div class="field">
+              <label class="field-label" for="prodImage">image (optional)</label>
+              <input id="prodImage" type="file" accept="image/*" />
+            </div>
+            <label class="row" style="font-size: 13px; margin-top: 4px;">
+              <input id="prodPublished" type="checkbox" checked /> published in shop
+            </label>
+            <div class="admin-actions" style="margin-top: 8px;">
+              <button id="saveProductBtn" class="btn primary" type="button">save product</button>
+              <button id="logoutBtn" class="btn" type="button">sign out</button>
+            </div>
+            <p id="productStatus" class="status"></p>
+
+            <p class="panel-label" style="margin-top: 12px;">inventory controls</p>
+            <ul id="adminProductList" class="admin-list"></ul>
+
+            <p class="panel-label" style="margin-top: 12px;">recent orders</p>
+            <ul id="adminOrderList" class="admin-list"></ul>
+          </section>
+        </aside>
+
+        <article class="window active" id="posts">
+          <h2 class="panel-title">posts</h2>
+          <section class="card">
+            <p class="panel-label">latest posts</p>
+            <p id="noPosts" class="muted">No admin posts yet.</p>
+            <ul id="postList" class="post-list"></ul>
+          </section>
+        </article>
+
+        <article class="window" id="shop">
+          <h2 class="panel-title">shop</h2>
+          <div class="shop-grid">
+            <section class="card">
+              <div class="row" style="justify-content: space-between;">
+                <p class="panel-label" style="margin: 0;">products</p>
+                <input id="productSearch" type="text" placeholder="search products" style="max-width: 220px;" />
+              </div>
+              <p id="noProducts" class="muted">No products published yet.</p>
+              <div id="productGrid" class="product-grid"></div>
+            </section>
+
+            <section class="card">
+              <p class="panel-label">cart</p>
+              <p id="emptyCart" class="muted">Cart is empty.</p>
+              <ul id="cartList" class="cart-list"></ul>
+              <p id="cartTotal" class="order-total">Total: 0 CZK</p>
+
+              <p class="panel-label" style="margin-top: 12px;">checkout</p>
+              <div class="checkout-fields">
+                <input id="customerName" type="text" placeholder="full name" />
+                <input id="customerEmail" type="email" placeholder="email" />
+                <textarea id="customerAddress" placeholder="delivery address"></textarea>
+                <button id="checkoutBtn" class="btn primary" type="button">place order</button>
+              </div>
+              <p id="checkoutStatus" class="status"></p>
+            </section>
+          </div>
+
+          <section class="card">
+            <p class="panel-label">your local order history</p>
+            <ul id="orderList" class="order-list"></ul>
+            <p id="noOrders" class="muted">No orders yet.</p>
+          </section>
+        </article>
+
+        <article class="window" id="help">
+          <h2 class="panel-title">help</h2>
+          <section class="card">
+            <p class="panel-label">current build notes</p>
+            <p class="muted">This is now a local e-shop prototype with admin product management, inventory, cart, checkout and order history stored in IndexedDB.</p>
+          </section>
+        </article>
+      </section>
+    </section>
   </main>
+
+  <script>
+    const buttons = document.querySelectorAll(".window-btn");
+    const windows = document.querySelectorAll(".window");
+
+    const adminToggleBtn = document.getElementById("adminToggleBtn");
+    const closeAdminBtn = document.getElementById("closeAdminBtn");
+    const adminFlyout = document.getElementById("adminFlyout");
+
+    const loginPanel = document.getElementById("loginPanel");
+    const adminPanel = document.getElementById("adminPanel");
+    const loginBtn = document.getElementById("loginBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const loginStatus = document.getElementById("loginStatus");
+
+    const postInput = document.getElementById("postInput");
+    const postImageInput = document.getElementById("postImageInput");
+    const savePostBtn = document.getElementById("savePostBtn");
+    const saveStatus = document.getElementById("saveStatus");
+    const postList = document.getElementById("postList");
+    const noPosts = document.getElementById("noPosts");
+
+    const saveProductBtn = document.getElementById("saveProductBtn");
+    const productStatus = document.getElementById("productStatus");
+    const prodName = document.getElementById("prodName");
+    const prodSku = document.getElementById("prodSku");
+    const prodPrice = document.getElementById("prodPrice");
+    const prodStock = document.getElementById("prodStock");
+    const prodDesc = document.getElementById("prodDesc");
+    const prodImage = document.getElementById("prodImage");
+    const prodPublished = document.getElementById("prodPublished");
+    const adminProductList = document.getElementById("adminProductList");
+    const adminOrderList = document.getElementById("adminOrderList");
+
+    const productGrid = document.getElementById("productGrid");
+    const productSearch = document.getElementById("productSearch");
+    const noProducts = document.getElementById("noProducts");
+
+    const cartList = document.getElementById("cartList");
+    const emptyCart = document.getElementById("emptyCart");
+    const cartTotal = document.getElementById("cartTotal");
+
+    const customerName = document.getElementById("customerName");
+    const customerEmail = document.getElementById("customerEmail");
+    const customerAddress = document.getElementById("customerAddress");
+    const checkoutBtn = document.getElementById("checkoutBtn");
+    const checkoutStatus = document.getElementById("checkoutStatus");
+
+    const orderList = document.getElementById("orderList");
+    const noOrders = document.getElementById("noOrders");
+
+    const adminUser = document.getElementById("adminUser");
+    const adminPass = document.getElementById("adminPass");
+
+    const ADMIN_USERNAME = "admin";
+    const ADMIN_PASSWORD = "raketex123";
+    const AUTH_KEY = "raketex_admin_auth";
+    const CART_KEY = "raketex_cart_v1";
+
+    let productsCache = [];
+    let cart = loadCart();
+
+    function setActiveWindow(windowId) {
+      windows.forEach((windowItem) => {
+        windowItem.classList.toggle("active", windowItem.id === windowId);
+      });
+
+      buttons.forEach((button) => {
+        button.classList.toggle("active", button.dataset.window === windowId);
+      });
+    }
+
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => {
+        setActiveWindow(button.dataset.window);
+      });
+    });
+
+    adminToggleBtn.addEventListener("click", () => {
+      adminFlyout.classList.toggle("hidden");
+    });
+
+    closeAdminBtn.addEventListener("click", () => {
+      adminFlyout.classList.add("hidden");
+    });
+
+    function isAdminAuthenticated() {
+      return sessionStorage.getItem(AUTH_KEY) === "yes";
+    }
+
+    function setStatus(element, message, type) {
+      element.textContent = message;
+      element.classList.remove("ok", "warn");
+      if (type) {
+        element.classList.add(type);
+      }
+    }
+
+    function updateAdminUi() {
+      const isAdmin = isAdminAuthenticated();
+      loginPanel.classList.toggle("hidden", isAdmin);
+      adminPanel.classList.toggle("hidden", !isAdmin);
+      if (!isAdmin) {
+        postInput.value = "";
+      }
+    }
+
+    function openDb() {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open("raketexDb", 2);
+
+        request.onupgradeneeded = () => {
+          const db = request.result;
+
+          if (!db.objectStoreNames.contains("posts")) {
+            const posts = db.createObjectStore("posts", { keyPath: "id", autoIncrement: true });
+            posts.createIndex("createdAt", "createdAt", { unique: false });
+          }
+
+          if (!db.objectStoreNames.contains("products")) {
+            const products = db.createObjectStore("products", { keyPath: "id", autoIncrement: true });
+            products.createIndex("createdAt", "createdAt", { unique: false });
+          }
+
+          if (!db.objectStoreNames.contains("orders")) {
+            const orders = db.createObjectStore("orders", { keyPath: "id", autoIncrement: true });
+            orders.createIndex("createdAt", "createdAt", { unique: false });
+          }
+        };
+
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    function fileToDataUrl(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(reader.error);
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function addRecord(storeName, value) {
+      const db = await openDb();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(storeName, "readwrite");
+        tx.objectStore(storeName).add(value);
+        tx.oncomplete = () => {
+          db.close();
+          resolve();
+        };
+        tx.onerror = () => {
+          db.close();
+          reject(tx.error);
+        };
+      });
+    }
+
+    async function putRecord(storeName, value) {
+      const db = await openDb();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(storeName, "readwrite");
+        tx.objectStore(storeName).put(value);
+        tx.oncomplete = () => {
+          db.close();
+          resolve();
+        };
+        tx.onerror = () => {
+          db.close();
+          reject(tx.error);
+        };
+      });
+    }
+
+    async function deleteRecord(storeName, id) {
+      const db = await openDb();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(storeName, "readwrite");
+        tx.objectStore(storeName).delete(id);
+        tx.oncomplete = () => {
+          db.close();
+          resolve();
+        };
+        tx.onerror = () => {
+          db.close();
+          reject(tx.error);
+        };
+      });
+    }
+
+    async function getAll(storeName) {
+      const db = await openDb();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(storeName, "readonly");
+        const request = tx.objectStore(storeName).getAll();
+        request.onsuccess = () => {
+          db.close();
+          resolve(request.result || []);
+        };
+        request.onerror = () => {
+          db.close();
+          reject(request.error);
+        };
+      });
+    }
+
+    function loadCart() {
+      try {
+        const parsed = JSON.parse(localStorage.getItem(CART_KEY) || "[]");
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function saveCart() {
+      localStorage.setItem(CART_KEY, JSON.stringify(cart));
+    }
+
+    function formatPrice(value) {
+      return `${Number(value).toFixed(2)} CZK`;
+    }
+
+    function formatDate(iso) {
+      return new Date(iso).toLocaleString();
+    }
+
+    function stockClass(stock) {
+      if (stock <= 0) return "stock-out";
+      if (stock <= 3) return "stock-low";
+      return "stock-ok";
+    }
+
+    function stockLabel(stock) {
+      if (stock <= 0) return "out of stock";
+      if (stock <= 3) return `only ${stock} left`;
+      return `${stock} in stock`;
+    }
+
+    async function renderPosts() {
+      try {
+        const posts = await getAll("posts");
+        posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        postList.innerHTML = "";
+
+        if (!posts.length) {
+          noPosts.classList.remove("hidden");
+          return;
+        }
+
+        noPosts.classList.add("hidden");
+
+        posts.forEach((post) => {
+          const item = document.createElement("li");
+          item.className = "post-item";
+
+          if (post.text) {
+            const text = document.createElement("p");
+            text.className = "post-text";
+            text.textContent = post.text;
+            item.appendChild(text);
+          }
+
+          if (post.imageDataUrl) {
+            const image = document.createElement("img");
+            image.className = "post-image";
+            image.src = post.imageDataUrl;
+            image.alt = "Admin post image";
+            item.appendChild(image);
+          }
+
+          const meta = document.createElement("p");
+          meta.className = "post-meta";
+          meta.textContent = `by ${post.author} | ${formatDate(post.createdAt)}`;
+          item.appendChild(meta);
+
+          postList.appendChild(item);
+        });
+      } catch (error) {
+        noPosts.classList.remove("hidden");
+        noPosts.textContent = "Could not load posts from local database.";
+      }
+    }
+
+    async function renderProducts() {
+      const searchTerm = productSearch.value.trim().toLowerCase();
+      const publishedProducts = productsCache
+        .filter((product) => product.published)
+        .filter((product) => {
+          if (!searchTerm) return true;
+          return [product.name, product.sku, product.description].join(" ").toLowerCase().includes(searchTerm);
+        });
+
+      productGrid.innerHTML = "";
+      if (!publishedProducts.length) {
+        noProducts.classList.remove("hidden");
+        return;
+      }
+
+      noProducts.classList.add("hidden");
+      publishedProducts.forEach((product) => {
+        const card = document.createElement("article");
+        card.className = "product-card";
+
+        if (product.imageDataUrl) {
+          const image = document.createElement("img");
+          image.className = "product-image";
+          image.src = product.imageDataUrl;
+          image.alt = product.name;
+          card.appendChild(image);
+        }
+
+        const name = document.createElement("p");
+        name.className = "product-name";
+        name.textContent = product.name;
+        card.appendChild(name);
+
+        if (product.description) {
+          const desc = document.createElement("p");
+          desc.className = "muted";
+          desc.textContent = product.description;
+          card.appendChild(desc);
+        }
+
+        const price = document.createElement("p");
+        price.className = "product-price";
+        price.textContent = formatPrice(product.price);
+        card.appendChild(price);
+
+        const stock = document.createElement("p");
+        stock.className = stockClass(product.stock);
+        stock.textContent = stockLabel(product.stock);
+        card.appendChild(stock);
+
+        const addBtn = document.createElement("button");
+        addBtn.className = "btn primary";
+        addBtn.type = "button";
+        addBtn.textContent = "add to cart";
+        addBtn.disabled = product.stock <= 0;
+        addBtn.addEventListener("click", () => addToCart(product.id));
+        card.appendChild(addBtn);
+
+        productGrid.appendChild(card);
+      });
+    }
+
+    function getProductById(productId) {
+      return productsCache.find((p) => p.id === productId);
+    }
+
+    function cartTotalValue() {
+      return cart.reduce((sum, line) => {
+        const product = getProductById(line.productId);
+        if (!product) return sum;
+        return sum + product.price * line.qty;
+      }, 0);
+    }
+
+    function renderCart() {
+      cartList.innerHTML = "";
+
+      if (!cart.length) {
+        emptyCart.classList.remove("hidden");
+      } else {
+        emptyCart.classList.add("hidden");
+      }
+
+      cart.forEach((line) => {
+        const product = getProductById(line.productId);
+        if (!product) return;
+
+        const li = document.createElement("li");
+        li.className = "cart-item";
+
+        const name = document.createElement("p");
+        name.className = "cart-name";
+        name.textContent = `${product.name} (${formatPrice(product.price)})`;
+        li.appendChild(name);
+
+        const controls = document.createElement("div");
+        controls.className = "row";
+
+        const qty = document.createElement("span");
+        qty.className = "muted";
+        qty.textContent = `qty: ${line.qty}`;
+
+        const minusBtn = document.createElement("button");
+        minusBtn.className = "btn";
+        minusBtn.type = "button";
+        minusBtn.textContent = "-";
+        minusBtn.addEventListener("click", () => changeCartQty(line.productId, -1));
+
+        const plusBtn = document.createElement("button");
+        plusBtn.className = "btn";
+        plusBtn.type = "button";
+        plusBtn.textContent = "+";
+        plusBtn.disabled = line.qty >= product.stock;
+        plusBtn.addEventListener("click", () => changeCartQty(line.productId, 1));
+
+        const removeBtn = document.createElement("button");
+        removeBtn.className = "btn";
+        removeBtn.type = "button";
+        removeBtn.textContent = "remove";
+        removeBtn.addEventListener("click", () => removeFromCart(line.productId));
+
+        controls.append(qty, minusBtn, plusBtn, removeBtn);
+        li.appendChild(controls);
+
+        cartList.appendChild(li);
+      });
+
+      cartTotal.textContent = `Total: ${formatPrice(cartTotalValue())}`;
+    }
+
+    async function refreshProductsAndShop() {
+      productsCache = await getAll("products");
+      productsCache.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      renderProducts();
+      renderCart();
+      renderAdminProducts();
+    }
+
+    function addToCart(productId) {
+      const product = getProductById(productId);
+      if (!product || product.stock <= 0) return;
+
+      const line = cart.find((item) => item.productId === productId);
+      if (line) {
+        if (line.qty < product.stock) {
+          line.qty += 1;
+        }
+      } else {
+        cart.push({ productId, qty: 1 });
+      }
+
+      saveCart();
+      renderCart();
+      setStatus(checkoutStatus, "", "");
+    }
+
+    function removeFromCart(productId) {
+      cart = cart.filter((item) => item.productId !== productId);
+      saveCart();
+      renderCart();
+    }
+
+    function changeCartQty(productId, delta) {
+      const line = cart.find((item) => item.productId === productId);
+      const product = getProductById(productId);
+      if (!line || !product) return;
+
+      const nextQty = line.qty + delta;
+      if (nextQty <= 0) {
+        removeFromCart(productId);
+        return;
+      }
+
+      line.qty = Math.min(nextQty, product.stock);
+      saveCart();
+      renderCart();
+    }
+
+    async function placeOrder(customer) {
+      const db = await openDb();
+
+      return new Promise((resolve, reject) => {
+        if (!cart.length) {
+          db.close();
+          reject(new Error("Cart is empty"));
+          return;
+        }
+
+        const tx = db.transaction(["products", "orders"], "readwrite");
+        const productsStore = tx.objectStore("products");
+        const ordersStore = tx.objectStore("orders");
+
+        const orderItems = [];
+        const productsToUpdate = [];
+        let subtotal = 0;
+        let pending = cart.length;
+        let failed = false;
+
+        cart.forEach((line) => {
+          const getReq = productsStore.get(line.productId);
+          getReq.onsuccess = () => {
+            if (failed) return;
+
+            const product = getReq.result;
+            if (!product) {
+              failed = true;
+              reject(new Error("Some products are missing."));
+              tx.abort();
+              return;
+            }
+
+            if (product.stock < line.qty) {
+              failed = true;
+              reject(new Error(`Not enough stock for ${product.name}.`));
+              tx.abort();
+              return;
+            }
+
+            const lineTotal = Number(product.price) * line.qty;
+            subtotal += lineTotal;
+            orderItems.push({
+              productId: product.id,
+              name: product.name,
+              sku: product.sku,
+              price: Number(product.price),
+              qty: line.qty,
+              lineTotal
+            });
+
+            productsToUpdate.push({ ...product, stock: product.stock - line.qty });
+
+            pending -= 1;
+            if (pending === 0) {
+              productsToUpdate.forEach((updatedProduct) => {
+                productsStore.put(updatedProduct);
+              });
+
+              ordersStore.add({
+                customerName: customer.name,
+                customerEmail: customer.email,
+                customerAddress: customer.address,
+                items: orderItems,
+                subtotal,
+                total: subtotal,
+                status: "received",
+                createdAt: new Date().toISOString()
+              });
+            }
+          };
+
+          getReq.onerror = () => {
+            if (failed) return;
+            failed = true;
+            reject(getReq.error || new Error("Could not read product."));
+            tx.abort();
+          };
+        });
+
+        tx.oncomplete = () => {
+          db.close();
+          resolve();
+        };
+
+        tx.onerror = () => {
+          db.close();
+          if (!failed) {
+            reject(tx.error || new Error("Order transaction failed."));
+          }
+        };
+
+        tx.onabort = () => {
+          db.close();
+        };
+      });
+    }
+
+    async function renderOrders() {
+      const orders = await getAll("orders");
+      orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+      orderList.innerHTML = "";
+      adminOrderList.innerHTML = "";
+
+      if (!orders.length) {
+        noOrders.classList.remove("hidden");
+        const adminEmpty = document.createElement("li");
+        adminEmpty.className = "admin-item";
+        adminEmpty.textContent = "No orders yet.";
+        adminOrderList.appendChild(adminEmpty);
+        return;
+      }
+
+      noOrders.classList.add("hidden");
+
+      orders.forEach((order) => {
+        const customerOrder = document.createElement("li");
+        customerOrder.className = "order-item";
+        customerOrder.innerHTML = `<p class="post-text">Order #${order.id} | ${formatPrice(order.total)}</p><p class="muted">${order.customerName} | ${formatDate(order.createdAt)} | status: ${order.status}</p>`;
+        orderList.appendChild(customerOrder);
+
+        const adminOrder = document.createElement("li");
+        adminOrder.className = "admin-item";
+        adminOrder.innerHTML = `<p class="post-text">#${order.id} ${order.customerName} (${order.customerEmail})</p><p class="muted">${order.items.length} item(s) | ${formatPrice(order.total)} | ${order.status}</p>`;
+        adminOrderList.appendChild(adminOrder);
+      });
+    }
+
+    function renderAdminProducts() {
+      adminProductList.innerHTML = "";
+
+      if (!productsCache.length) {
+        const li = document.createElement("li");
+        li.className = "admin-item";
+        li.textContent = "No products yet.";
+        adminProductList.appendChild(li);
+        return;
+      }
+
+      productsCache.forEach((product) => {
+        const li = document.createElement("li");
+        li.className = "admin-item";
+
+        const heading = document.createElement("p");
+        heading.className = "post-text";
+        heading.textContent = `${product.name} (${product.sku || "no sku"})`;
+
+        const meta = document.createElement("p");
+        meta.className = "muted";
+        meta.textContent = `${formatPrice(product.price)} | stock ${product.stock} | ${product.published ? "published" : "hidden"}`;
+
+        const row = document.createElement("div");
+        row.className = "row";
+
+        const stockMinus = document.createElement("button");
+        stockMinus.className = "btn";
+        stockMinus.type = "button";
+        stockMinus.textContent = "stock -";
+        stockMinus.addEventListener("click", async () => {
+          const next = { ...product, stock: Math.max(0, product.stock - 1) };
+          await putRecord("products", next);
+          await refreshProductsAndShop();
+        });
+
+        const stockPlus = document.createElement("button");
+        stockPlus.className = "btn";
+        stockPlus.type = "button";
+        stockPlus.textContent = "stock +";
+        stockPlus.addEventListener("click", async () => {
+          const next = { ...product, stock: product.stock + 1 };
+          await putRecord("products", next);
+          await refreshProductsAndShop();
+        });
+
+        const togglePublished = document.createElement("button");
+        togglePublished.className = "btn";
+        togglePublished.type = "button";
+        togglePublished.textContent = product.published ? "hide" : "publish";
+        togglePublished.addEventListener("click", async () => {
+          const next = { ...product, published: !product.published };
+          await putRecord("products", next);
+          await refreshProductsAndShop();
+        });
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = "btn";
+        deleteBtn.type = "button";
+        deleteBtn.textContent = "delete";
+        deleteBtn.addEventListener("click", async () => {
+          await deleteRecord("products", product.id);
+          cart = cart.filter((line) => line.productId !== product.id);
+          saveCart();
+          await refreshProductsAndShop();
+        });
+
+        row.append(stockMinus, stockPlus, togglePublished, deleteBtn);
+        li.append(heading, meta, row);
+        adminProductList.appendChild(li);
+      });
+    }
+
+    loginBtn.addEventListener("click", () => {
+      const user = adminUser.value.trim();
+      const pass = adminPass.value;
+
+      if (user === ADMIN_USERNAME && pass === ADMIN_PASSWORD) {
+        sessionStorage.setItem(AUTH_KEY, "yes");
+        setStatus(loginStatus, "Signed in as admin.", "ok");
+        adminPass.value = "";
+        updateAdminUi();
+      } else {
+        setStatus(loginStatus, "Wrong username or password.", "warn");
+      }
+    });
+
+    logoutBtn.addEventListener("click", () => {
+      sessionStorage.removeItem(AUTH_KEY);
+      setStatus(productStatus, "Signed out.", "ok");
+      updateAdminUi();
+    });
+
+    savePostBtn.addEventListener("click", async () => {
+      const text = postInput.value.trim();
+      const selectedImage = postImageInput.files[0];
+      if (!text && !selectedImage) {
+        setStatus(saveStatus, "Add text or an image before publishing.", "warn");
+        return;
+      }
+
+      try {
+        let imageDataUrl = "";
+        if (selectedImage) {
+          imageDataUrl = await fileToDataUrl(selectedImage);
+        }
+
+        await addRecord("posts", {
+          text,
+          imageDataUrl,
+          createdAt: new Date().toISOString(),
+          author: "admin"
+        });
+
+        postInput.value = "";
+        postImageInput.value = "";
+        setStatus(saveStatus, "Post saved to local database.", "ok");
+        await renderPosts();
+      } catch (error) {
+        setStatus(saveStatus, "Failed to save post.", "warn");
+      }
+    });
+
+    saveProductBtn.addEventListener("click", async () => {
+      const name = prodName.value.trim();
+      const sku = prodSku.value.trim();
+      const price = Number(prodPrice.value);
+      const stock = Number(prodStock.value);
+      const description = prodDesc.value.trim();
+      const published = prodPublished.checked;
+
+      if (!name || !Number.isFinite(price) || price < 0 || !Number.isFinite(stock) || stock < 0) {
+        setStatus(productStatus, "Fill name, valid price and stock.", "warn");
+        return;
+      }
+
+      try {
+        let imageDataUrl = "";
+        if (prodImage.files[0]) {
+          imageDataUrl = await fileToDataUrl(prodImage.files[0]);
+        }
+
+        await addRecord("products", {
+          name,
+          sku,
+          price,
+          stock: Math.floor(stock),
+          description,
+          imageDataUrl,
+          published,
+          createdAt: new Date().toISOString()
+        });
+
+        prodName.value = "";
+        prodSku.value = "";
+        prodPrice.value = "";
+        prodStock.value = "";
+        prodDesc.value = "";
+        prodImage.value = "";
+        prodPublished.checked = true;
+
+        setStatus(productStatus, "Product saved.", "ok");
+        await refreshProductsAndShop();
+      } catch (error) {
+        setStatus(productStatus, "Failed to save product.", "warn");
+      }
+    });
+
+    productSearch.addEventListener("input", () => {
+      renderProducts();
+    });
+
+    checkoutBtn.addEventListener("click", async () => {
+      const name = customerName.value.trim();
+      const email = customerEmail.value.trim();
+      const address = customerAddress.value.trim();
+
+      if (!cart.length) {
+        setStatus(checkoutStatus, "Cart is empty.", "warn");
+        return;
+      }
+
+      if (!name || !email || !address) {
+        setStatus(checkoutStatus, "Fill name, email and address.", "warn");
+        return;
+      }
+
+      try {
+        await placeOrder({ name, email, address });
+        cart = [];
+        saveCart();
+        customerName.value = "";
+        customerEmail.value = "";
+        customerAddress.value = "";
+        setStatus(checkoutStatus, "Order placed successfully.", "ok");
+
+        await refreshProductsAndShop();
+        await renderOrders();
+      } catch (error) {
+        setStatus(checkoutStatus, error.message || "Could not place order.", "warn");
+      }
+    });
+
+    async function bootstrap() {
+      updateAdminUi();
+      await renderPosts();
+      await refreshProductsAndShop();
+      await renderOrders();
+      renderCart();
+    }
+
+    bootstrap();
+  </script>
 </body>
 </html>
