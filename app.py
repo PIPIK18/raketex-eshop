@@ -13,6 +13,7 @@ from flask import (
     redirect,
     render_template,
     request,
+    Response,
     send_from_directory,
     session,
     url_for,
@@ -30,6 +31,7 @@ DATABASE_URL = os.environ.get("DATABASE_URL") or os.environ.get("POSTGRES_URL")
 BLOB_READ_WRITE_TOKEN = os.environ.get("BLOB_READ_WRITE_TOKEN")
 ALLOWED_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
 DB_INIT_DONE = False
+PRIVATE_BLOB_PREFIX = "blob-private:"
 
 
 app = Flask(__name__)
@@ -153,12 +155,28 @@ def is_remote_image(image_ref):
     return parsed.scheme in {"http", "https"} and bool(parsed.netloc)
 
 
+def is_private_blob_ref(image_ref):
+    return bool(image_ref and image_ref.startswith(PRIVATE_BLOB_PREFIX))
+
+
+def private_blob_pathname(image_ref):
+    return image_ref.removeprefix(PRIVATE_BLOB_PREFIX)
+
+
 def post_image_src(image_ref):
     if not image_ref:
         return ""
+    if is_private_blob_ref(image_ref):
+        return url_for("blob_image", pathname=private_blob_pathname(image_ref))
     if is_remote_image(image_ref):
         return image_ref
     return url_for("uploaded_file", filename=image_ref)
+
+
+def blob_result_value(blob, key):
+    if isinstance(blob, dict):
+        return blob.get(key)
+    return getattr(blob, key)
 
 
 def save_uploaded_image(file_storage):
@@ -175,16 +193,31 @@ def save_uploaded_image(file_storage):
         from vercel.blob import BlobClient
 
         pathname = f"uploads/{filename}"
-        blob = BlobClient().put(
-            pathname,
-            file_storage.read(),
-            access="public",
-            content_type=file_storage.mimetype or None,
-            add_random_suffix=False,
-        )
-        if isinstance(blob, dict):
-            return blob.get("url")
-        return blob.url
+        content = file_storage.read()
+        content_type = file_storage.mimetype or None
+        client = BlobClient()
+
+        try:
+            blob = client.put(
+                pathname,
+                content,
+                access="public",
+                content_type=content_type,
+                add_random_suffix=False,
+            )
+            return blob_result_value(blob, "url")
+        except Exception as exc:
+            if "private store" not in str(exc).lower():
+                raise
+
+            blob = client.put(
+                pathname,
+                content,
+                access="private",
+                content_type=content_type,
+                add_random_suffix=False,
+            )
+            return f"{PRIVATE_BLOB_PREFIX}{blob_result_value(blob, 'pathname')}"
 
     UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
     file_storage.save(UPLOAD_DIR / filename)
@@ -514,6 +547,16 @@ def delete_post(post_id):
 @app.route("/uploads/<path:filename>")
 def uploaded_file(filename):
     return send_from_directory(UPLOAD_DIR, filename)
+
+
+@app.route("/blob/<path:pathname>")
+def blob_image(pathname):
+    from vercel.blob import BlobClient
+
+    blob = BlobClient().get(pathname, access="private")
+    content = blob_result_value(blob, "content")
+    content_type = blob_result_value(blob, "content_type") or "application/octet-stream"
+    return Response(content, mimetype=content_type)
 
 
 @app.route("/assets/<path:filename>")

@@ -53,6 +53,8 @@ RAKETEX_ADMIN_PASSWORD
 
 `RAKETEX_SECRET_KEY` should be a long random value. `RAKETEX_ADMIN_PASSWORD` replaces the local default password.
 
+If your Blob store is private, the app will upload images privately and serve them through Flask at `/blob/...`. Public Blob stores use direct public Blob URLs.
+
 Vercel recognizes `app.py` as a Flask entrypoint, so no static `index.html` is needed.
 
 ## Optional local production-like run
