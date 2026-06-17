@@ -182,6 +182,8 @@ def save_uploaded_image(file_storage):
             content_type=file_storage.mimetype or None,
             add_random_suffix=False,
         )
+        if isinstance(blob, dict):
+            return blob.get("url")
         return blob.url
 
     UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
@@ -318,6 +320,20 @@ def delete_post_by_id(post_id):
         db.execute("DELETE FROM posts WHERE id = ?", (post_id,))
 
 
+def storage_check():
+    try:
+        init_db()
+        with get_db() as db:
+            if using_postgres():
+                db.execute("SELECT 1").fetchone()
+            else:
+                db.execute("SELECT 1").fetchone()
+        return None
+    except Exception as exc:
+        app.logger.exception("Storage check failed")
+        return str(exc)
+
+
 @app.before_request
 def ensure_database():
     if request.endpoint in {"healthz", "asset_file", "workspace_asset_file"}:
@@ -342,14 +358,17 @@ def inject_admin_state():
 
 @app.route("/healthz")
 def healthz():
+    issues = storage_config_issues()
+    storage_error = None if issues else storage_check()
     return jsonify(
         {
-            "ok": not storage_config_issues(),
+            "ok": not issues and storage_error is None,
             "running_on_vercel": running_on_vercel(),
             "using_postgres": using_postgres(),
             "using_blob_storage": using_blob_storage(),
             "database_env": "DATABASE_URL" if os.environ.get("DATABASE_URL") else "POSTGRES_URL" if os.environ.get("POSTGRES_URL") else None,
-            "issues": storage_config_issues(),
+            "issues": issues,
+            "storage_error": storage_error,
         }
     )
 
@@ -410,6 +429,10 @@ def new_post():
         except ValueError as exc:
             flash(str(exc), "warn")
             return render_template("post_form.html", post=None)
+        except Exception as exc:
+            app.logger.exception("Image upload failed")
+            flash(f"Image upload failed: {exc}", "warn")
+            return render_template("post_form.html", post=None)
 
         title = request.form.get("title", "").strip()
         body = request.form.get("body", "").strip()
@@ -420,7 +443,12 @@ def new_post():
             flash("Title and body are required.", "warn")
             return render_template("post_form.html", post=None)
 
-        create_post(title, category, body, image_filename, published)
+        try:
+            create_post(title, category, body, image_filename, published)
+        except Exception as exc:
+            app.logger.exception("Post creation failed")
+            flash(f"Post creation failed: {exc}", "warn")
+            return render_template("post_form.html", post=None)
         flash("Post created.", "ok")
         return redirect(url_for("admin"))
     return render_template("post_form.html", post=None)
@@ -441,6 +469,10 @@ def edit_post(post_id):
         except ValueError as exc:
             flash(str(exc), "warn")
             return render_template("post_form.html", post=post)
+        except Exception as exc:
+            app.logger.exception("Image upload failed")
+            flash(f"Image upload failed: {exc}", "warn")
+            return render_template("post_form.html", post=post)
 
         image_filename = new_image or post["image_filename"]
         title = request.form.get("title", "").strip()
@@ -452,7 +484,12 @@ def edit_post(post_id):
             flash("Title and body are required.", "warn")
             return render_template("post_form.html", post=post)
 
-        update_post(post_id, title, category, body, image_filename, published)
+        try:
+            update_post(post_id, title, category, body, image_filename, published)
+        except Exception as exc:
+            app.logger.exception("Post update failed")
+            flash(f"Post update failed: {exc}", "warn")
+            return render_template("post_form.html", post=post)
         flash("Post updated.", "ok")
         return redirect(url_for("admin"))
 
@@ -464,7 +501,12 @@ def delete_post(post_id):
     blocked = require_admin()
     if blocked:
         return blocked
-    delete_post_by_id(post_id)
+    try:
+        delete_post_by_id(post_id)
+    except Exception as exc:
+        app.logger.exception("Post deletion failed")
+        flash(f"Post deletion failed: {exc}", "warn")
+        return redirect(url_for("admin"))
     flash("Post deleted.", "ok")
     return redirect(url_for("admin"))
 
