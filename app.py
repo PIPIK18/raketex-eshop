@@ -1,10 +1,14 @@
+import json
 import os
+import secrets
 import sqlite3
 import uuid
 from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.error import HTTPError, URLError
+from urllib.parse import urlencode, urlparse
+from urllib.request import Request as UrlRequest, urlopen
 
 from flask import (
     Flask,
@@ -35,6 +39,9 @@ PRIVATE_BLOB_PREFIX = "blob-private:"
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET")
 GOOGLE_REDIRECT_URI = os.environ.get("GOOGLE_REDIRECT_URI")
+GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth"
+GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
+GOOGLE_USERINFO_URL = "https://openidconnect.googleapis.com/v1/userinfo"
 
 
 app = Flask(__name__)
@@ -220,17 +227,26 @@ def google_sign_in_enabled():
     return bool(GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET)
 
 
-def google_oauth_client():
-    from authlib.integrations.flask_client import OAuth
+def google_redirect_uri():
+    return GOOGLE_REDIRECT_URI or url_for("google_callback", _external=True)
 
-    oauth = OAuth(app)
-    return oauth.register(
-        name="google",
-        client_id=GOOGLE_CLIENT_ID,
-        client_secret=GOOGLE_CLIENT_SECRET,
-        server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
-        client_kwargs={"scope": "openid email profile"},
-    )
+
+def request_json(url, data=None, headers=None):
+    body = None
+    request_headers = headers or {}
+    if data is not None:
+        body = urlencode(data).encode("utf-8")
+        request_headers = {"Content-Type": "application/x-www-form-urlencoded", **request_headers}
+
+    request_obj = UrlRequest(url, data=body, headers=request_headers)
+    try:
+        with urlopen(request_obj, timeout=10) as response:
+            return json.loads(response.read().decode("utf-8"))
+    except HTTPError as exc:
+        detail = exc.read().decode("utf-8", errors="replace")
+        raise RuntimeError(f"Google returned {exc.code}: {detail}") from exc
+    except URLError as exc:
+        raise RuntimeError(f"Could not reach Google: {exc.reason}") from exc
 
 
 def image_is_allowed(filename):
@@ -715,9 +731,17 @@ def google_login():
         flash("Google sign-in is not configured yet.", "warn")
         return redirect(url_for("login"))
 
-    google = google_oauth_client()
-    redirect_uri = GOOGLE_REDIRECT_URI or url_for("google_callback", _external=True)
-    return google.authorize_redirect(redirect_uri)
+    state = secrets.token_urlsafe(24)
+    session["google_oauth_state"] = state
+    params = {
+        "client_id": GOOGLE_CLIENT_ID,
+        "redirect_uri": google_redirect_uri(),
+        "response_type": "code",
+        "scope": "openid email profile",
+        "state": state,
+        "prompt": "select_account",
+    }
+    return redirect(f"{GOOGLE_AUTH_URL}?{urlencode(params)}")
 
 
 @app.route("/auth/google/callback")
@@ -726,9 +750,41 @@ def google_callback():
         flash("Google sign-in is not configured yet.", "warn")
         return redirect(url_for("login"))
 
-    google = google_oauth_client()
-    token = google.authorize_access_token()
-    userinfo = token.get("userinfo") or google.parse_id_token(token)
+    error = request.args.get("error")
+    if error:
+        flash(f"Google sign-in failed: {error}", "warn")
+        return redirect(url_for("login"))
+
+    state = request.args.get("state")
+    if not state or state != session.pop("google_oauth_state", None):
+        flash("Google sign-in state did not match. Try again.", "warn")
+        return redirect(url_for("login"))
+
+    code = request.args.get("code")
+    if not code:
+        flash("Google sign-in did not return a code.", "warn")
+        return redirect(url_for("login"))
+
+    try:
+        token = request_json(
+            GOOGLE_TOKEN_URL,
+            {
+                "code": code,
+                "client_id": GOOGLE_CLIENT_ID,
+                "client_secret": GOOGLE_CLIENT_SECRET,
+                "redirect_uri": google_redirect_uri(),
+                "grant_type": "authorization_code",
+            },
+        )
+        access_token = token.get("access_token")
+        if not access_token:
+            raise RuntimeError("Google did not return an access token.")
+        userinfo = request_json(GOOGLE_USERINFO_URL, headers={"Authorization": f"Bearer {access_token}"})
+    except RuntimeError as exc:
+        app.logger.exception("Google sign-in failed")
+        flash(str(exc), "warn")
+        return redirect(url_for("login"))
+
     google_id = userinfo.get("sub")
     display_name = (userinfo.get("name") or userinfo.get("email") or "user").strip()
 
