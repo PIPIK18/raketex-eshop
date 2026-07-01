@@ -17,25 +17,36 @@
         <span>{{ comments|length }}</span>
       </div>
 
-      <form class="comment-form" method="post" action="{{ url_for('add_comment', post_id=post.id) }}">
-        <div class="field">
-          <label for="comment-author">name</label>
-          <input id="comment-author" name="author" type="text" maxlength="40" placeholder="your name" />
+      {% if is_signed_in %}
+        <form class="comment-form" method="post" action="{{ url_for('add_comment', post_id=post.id) }}">
+          <p class="muted">commenting as {{ current_user_name }}</p>
+          <div class="field">
+            <label for="comment-body">comment</label>
+            <textarea id="comment-body" name="body" maxlength="1200" required placeholder="write something under this post"></textarea>
+          </div>
+          <button class="btn primary" type="submit">post comment</button>
+        </form>
+      {% else %}
+        <div class="comment-form">
+          <p class="muted">Sign in as user to comment.</p>
+          <a class="btn primary" href="{{ url_for('login', next=url_for('post_detail', post_id=post.id)) }}">sign in</a>
         </div>
-        <div class="field">
-          <label for="comment-body">comment</label>
-          <textarea id="comment-body" name="body" maxlength="1200" required placeholder="write something under this post"></textarea>
-        </div>
-        <button class="btn primary" type="submit">post comment</button>
-      </form>
+      {% endif %}
 
       <div class="comment-list">
         {% if comments %}
           {% for comment in comments %}
             <article class="comment-box">
               <div class="comment-meta">
-                <strong>{{ comment.author }}</strong>
-                <span>{{ comment.created_at[:10] }}</span>
+                <strong>{{ comment.display_author }}</strong>
+                <div class="comment-tools">
+                  <span>{{ comment.created_at[:10] }}</span>
+                  {% if is_admin %}
+                    <form action="{{ url_for('delete_comment', comment_id=comment.id) }}" method="post" style="margin:0;">
+                      <button class="comment-delete" type="submit">delete</button>
+                    </form>
+                  {% endif %}
+                </div>
               </div>
               <p>{{ comment.body }}</p>
             </article>

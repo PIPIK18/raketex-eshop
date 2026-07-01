@@ -32,6 +32,9 @@ BLOB_READ_WRITE_TOKEN = os.environ.get("BLOB_READ_WRITE_TOKEN")
 ALLOWED_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
 DB_INIT_DONE = False
 PRIVATE_BLOB_PREFIX = "blob-private:"
+GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
+GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET")
+GOOGLE_REDIRECT_URI = os.environ.get("GOOGLE_REDIRECT_URI")
 
 
 app = Flask(__name__)
@@ -102,9 +105,22 @@ def init_db():
             )
             db.execute(
                 """
+                CREATE TABLE IF NOT EXISTS users (
+                    id BIGSERIAL PRIMARY KEY,
+                    google_id TEXT UNIQUE NOT NULL,
+                    email TEXT,
+                    display_name TEXT NOT NULL,
+                    avatar_url TEXT,
+                    created_at TEXT NOT NULL
+                )
+                """
+            )
+            db.execute(
+                """
                 CREATE TABLE IF NOT EXISTS comments (
                     id BIGSERIAL PRIMARY KEY,
                     post_id BIGINT NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+                    user_id BIGINT REFERENCES users(id) ON DELETE SET NULL,
                     author TEXT NOT NULL,
                     body TEXT NOT NULL,
                     created_at TEXT NOT NULL
@@ -128,17 +144,42 @@ def init_db():
             )
             db.execute(
                 """
+                CREATE TABLE IF NOT EXISTS users (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    google_id TEXT UNIQUE NOT NULL,
+                    email TEXT,
+                    display_name TEXT NOT NULL,
+                    avatar_url TEXT,
+                    created_at TEXT NOT NULL
+                )
+                """
+            )
+            db.execute(
+                """
                 CREATE TABLE IF NOT EXISTS comments (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     post_id INTEGER NOT NULL,
+                    user_id INTEGER,
                     author TEXT NOT NULL,
                     body TEXT NOT NULL,
                     created_at TEXT NOT NULL,
+                    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
                     FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
                 )
                 """
             )
+        ensure_comment_user_id_column(db)
     DB_INIT_DONE = True
+
+
+def ensure_comment_user_id_column(db):
+    if using_postgres():
+        db.execute("ALTER TABLE comments ADD COLUMN IF NOT EXISTS user_id BIGINT REFERENCES users(id) ON DELETE SET NULL")
+        return
+
+    columns = db.execute("PRAGMA table_info(comments)").fetchall()
+    if not any(column["name"] == "user_id" for column in columns):
+        db.execute("ALTER TABLE comments ADD COLUMN user_id INTEGER REFERENCES users(id) ON DELETE SET NULL")
 
 
 def admin_username():
@@ -156,11 +197,40 @@ def is_admin():
     return session.get("is_admin") is True
 
 
+def is_signed_in():
+    return is_admin() or bool(session.get("user_id") or session.get("user_name"))
+
+
+def current_user_name():
+    return session.get("user_name") or ("admin" if is_admin() else "")
+
+
+def current_user_id():
+    return session.get("user_id")
+
+
 def require_admin():
     if not is_admin():
         flash("Sign in first.", "warn")
         return redirect(url_for("login"))
     return None
+
+
+def google_sign_in_enabled():
+    return bool(GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET)
+
+
+def google_oauth_client():
+    from authlib.integrations.flask_client import OAuth
+
+    oauth = OAuth(app)
+    return oauth.register(
+        name="google",
+        client_id=GOOGLE_CLIENT_ID,
+        client_secret=GOOGLE_CLIENT_SECRET,
+        server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
+        client_kwargs={"scope": "openid email profile"},
+    )
 
 
 def image_is_allowed(filename):
@@ -323,42 +393,114 @@ def list_comments(post_id):
         if using_postgres():
             return db.execute(
                 """
-                SELECT * FROM comments
-                WHERE post_id = %s
-                ORDER BY created_at ASC, id ASC
+                SELECT
+                    comments.*,
+                    COALESCE(users.display_name, comments.author) AS display_author,
+                    users.avatar_url AS avatar_url
+                FROM comments
+                LEFT JOIN users ON users.id = comments.user_id
+                WHERE comments.post_id = %s
+                ORDER BY comments.created_at ASC, comments.id ASC
                 """,
                 (post_id,),
             ).fetchall()
 
         return db.execute(
             """
-            SELECT * FROM comments
-            WHERE post_id = ?
-            ORDER BY created_at ASC, id ASC
+            SELECT
+                comments.*,
+                COALESCE(users.display_name, comments.author) AS display_author,
+                users.avatar_url AS avatar_url
+            FROM comments
+            LEFT JOIN users ON users.id = comments.user_id
+            WHERE comments.post_id = ?
+            ORDER BY comments.created_at ASC, comments.id ASC
             """,
             (post_id,),
         ).fetchall()
 
 
-def create_comment(post_id, author, body):
+def create_comment(post_id, user_id, author, body):
     with get_db() as db:
         if using_postgres():
             db.execute(
                 """
-                INSERT INTO comments (post_id, author, body, created_at)
-                VALUES (%s, %s, %s, %s)
+                INSERT INTO comments (post_id, user_id, author, body, created_at)
+                VALUES (%s, %s, %s, %s, %s)
                 """,
-                (post_id, author, body, now_iso()),
+                (post_id, user_id, author, body, now_iso()),
             )
             return
 
         db.execute(
             """
-            INSERT INTO comments (post_id, author, body, created_at)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO comments (post_id, user_id, author, body, created_at)
+            VALUES (?, ?, ?, ?, ?)
             """,
-            (post_id, author, body, now_iso()),
+            (post_id, user_id, author, body, now_iso()),
         )
+
+
+def upsert_google_user(google_id, email, display_name, avatar_url):
+    timestamp = now_iso()
+    with get_db() as db:
+        if using_postgres():
+            user = db.execute("SELECT * FROM users WHERE google_id = %s", (google_id,)).fetchone()
+            if user:
+                db.execute(
+                    """
+                    UPDATE users
+                    SET email = %s, display_name = %s, avatar_url = %s
+                    WHERE id = %s
+                    """,
+                    (email, display_name, avatar_url, user["id"]),
+                )
+                return db.execute("SELECT * FROM users WHERE id = %s", (user["id"],)).fetchone()
+
+            return db.execute(
+                """
+                INSERT INTO users (google_id, email, display_name, avatar_url, created_at)
+                VALUES (%s, %s, %s, %s, %s)
+                RETURNING *
+                """,
+                (google_id, email, display_name, avatar_url, timestamp),
+            ).fetchone()
+
+        user = db.execute("SELECT * FROM users WHERE google_id = ?", (google_id,)).fetchone()
+        if user:
+            db.execute(
+                """
+                UPDATE users
+                SET email = ?, display_name = ?, avatar_url = ?
+                WHERE id = ?
+                """,
+                (email, display_name, avatar_url, user["id"]),
+            )
+            return db.execute("SELECT * FROM users WHERE id = ?", (user["id"],)).fetchone()
+
+        cursor = db.execute(
+            """
+            INSERT INTO users (google_id, email, display_name, avatar_url, created_at)
+            VALUES (?, ?, ?, ?, ?)
+            """,
+            (google_id, email, display_name, avatar_url, timestamp),
+        )
+        return db.execute("SELECT * FROM users WHERE id = ?", (cursor.lastrowid,)).fetchone()
+
+
+def get_comment(comment_id):
+    with get_db() as db:
+        if using_postgres():
+            return db.execute("SELECT * FROM comments WHERE id = %s", (comment_id,)).fetchone()
+        return db.execute("SELECT * FROM comments WHERE id = ?", (comment_id,)).fetchone()
+
+
+def delete_comment_by_id(comment_id):
+    with get_db() as db:
+        if using_postgres():
+            db.execute("DELETE FROM comments WHERE id = %s", (comment_id,))
+            return
+        db.execute("DELETE FROM comments WHERE id = ?", (comment_id,))
 
 
 def list_admin_posts():
@@ -453,7 +595,13 @@ def ensure_database():
 
 @app.context_processor
 def inject_admin_state():
-    return {"is_admin": is_admin(), "post_image_src": post_image_src}
+    return {
+        "is_admin": is_admin(),
+        "is_signed_in": is_signed_in(),
+        "current_user_name": current_user_name(),
+        "google_sign_in_enabled": google_sign_in_enabled(),
+        "post_image_src": post_image_src,
+    }
 
 
 @app.route("/healthz")
@@ -494,11 +642,12 @@ def add_comment(post_id):
     post = get_post(post_id, include_drafts=is_admin())
     if post is None:
         return render_template("404.html"), 404
+    if not is_signed_in():
+        flash("Sign in with user first.", "warn")
+        return redirect(url_for("login") + f"?next={url_for('post_detail', post_id=post_id)}#comments")
 
-    author = request.form.get("author", "").strip() or "visitor"
+    author = current_user_name()
     body = request.form.get("body", "").strip()
-    if len(author) > 40:
-        author = author[:40]
 
     if not body:
         flash("Write a comment first.", "warn")
@@ -508,13 +657,30 @@ def add_comment(post_id):
         return redirect(url_for("post_detail", post_id=post_id) + "#comments")
 
     try:
-        create_comment(post_id, author, body)
+        create_comment(post_id, current_user_id(), author, body)
     except Exception as exc:
         app.logger.exception("Comment creation failed")
         flash(f"Comment failed: {exc}", "warn")
         return redirect(url_for("post_detail", post_id=post_id) + "#comments")
 
     flash("Comment posted.", "ok")
+    return redirect(url_for("post_detail", post_id=post_id) + "#comments")
+
+
+@app.route("/comments/<int:comment_id>/delete", methods=["POST"])
+def delete_comment(comment_id):
+    blocked = require_admin()
+    if blocked:
+        return blocked
+
+    comment = get_comment(comment_id)
+    if comment is None:
+        flash("Comment not found.", "warn")
+        return redirect(url_for("home"))
+
+    post_id = comment["post_id"]
+    delete_comment_by_id(comment_id)
+    flash("Comment deleted.", "ok")
     return redirect(url_for("post_detail", post_id=post_id) + "#comments")
 
 
@@ -528,6 +694,7 @@ def admin():
 
 
 @app.route("/admin/login", methods=["GET", "POST"])
+@app.route("/user/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
         username = request.form.get("username", "").strip()
@@ -535,13 +702,56 @@ def login():
         if username == admin_username() and check_password_hash(admin_password_hash(), password):
             session.clear()
             session["is_admin"] = True
+            session["user_name"] = admin_username()
             flash("Signed in.", "ok")
-            return redirect(url_for("admin"))
+            return redirect(request.args.get("next") or url_for("admin"))
         flash("Wrong username or password.", "warn")
     return render_template("login.html")
 
 
+@app.route("/login/google")
+def google_login():
+    if not google_sign_in_enabled():
+        flash("Google sign-in is not configured yet.", "warn")
+        return redirect(url_for("login"))
+
+    google = google_oauth_client()
+    redirect_uri = GOOGLE_REDIRECT_URI or url_for("google_callback", _external=True)
+    return google.authorize_redirect(redirect_uri)
+
+
+@app.route("/auth/google/callback")
+def google_callback():
+    if not google_sign_in_enabled():
+        flash("Google sign-in is not configured yet.", "warn")
+        return redirect(url_for("login"))
+
+    google = google_oauth_client()
+    token = google.authorize_access_token()
+    userinfo = token.get("userinfo") or google.parse_id_token(token)
+    google_id = userinfo.get("sub")
+    display_name = (userinfo.get("name") or userinfo.get("email") or "user").strip()
+
+    if not google_id:
+        flash("Google sign-in did not return a user id.", "warn")
+        return redirect(url_for("login"))
+
+    user = upsert_google_user(
+        google_id=google_id,
+        email=userinfo.get("email"),
+        display_name=display_name[:80],
+        avatar_url=userinfo.get("picture"),
+    )
+    session.clear()
+    session["user_id"] = user["id"]
+    session["user_name"] = user["display_name"]
+    session["is_admin"] = False
+    flash("Signed in.", "ok")
+    return redirect(url_for("home"))
+
+
 @app.route("/admin/logout", methods=["POST"])
+@app.route("/user/logout", methods=["POST"])
 def logout():
     session.clear()
     flash("Signed out.", "ok")

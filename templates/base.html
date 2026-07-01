@@ -282,6 +282,21 @@
       color: #ffc59e;
       font-size: 13px;
     }
+    .comment-tools {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-left: auto;
+    }
+    .comment-delete {
+      padding: 0;
+      color: var(--warn);
+      background: transparent;
+      border: 0;
+      cursor: pointer;
+      font-weight: 700;
+      text-transform: lowercase;
+    }
     .comment-meta strong { color: var(--ink); }
     .comment-box p {
       margin: 0;
@@ -341,9 +356,15 @@
           </form>
           <a class="{% if request.endpoint in ['home', 'post_detail'] %}active{% endif %}" href="{{ url_for('home') }}">posts</a>
           <a class="{% if request.endpoint in ['admin', 'new_post', 'edit_post'] %}active{% endif %}" href="{{ url_for('admin') }}">admin</a>
+        {% elif is_signed_in %}
+          <form action="{{ url_for('logout') }}" method="post" style="margin:0;">
+            <button type="submit">logout</button>
+          </form>
+          <a class="{% if request.endpoint in ['home', 'post_detail'] %}active{% endif %}" href="{{ url_for('home') }}">posts</a>
+          <a class="active" href="{{ url_for('login') }}">{{ current_user_name }}</a>
         {% else %}
           <a class="{% if request.endpoint in ['home', 'post_detail'] %}active{% endif %}" href="{{ url_for('home') }}">posts</a>
-          <a class="{% if request.endpoint == 'login' %}active{% endif %}" href="{{ url_for('login') }}">admin</a>
+          <a class="{% if request.endpoint in ['login', 'google_login', 'google_callback'] %}active{% endif %}" href="{{ url_for('login') }}">user</a>
         {% endif %}
       </nav>
     </header>

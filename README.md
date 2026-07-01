@@ -49,11 +49,20 @@ BLOB_READ_WRITE_TOKEN
 RAKETEX_SECRET_KEY
 RAKETEX_ADMIN_USER
 RAKETEX_ADMIN_PASSWORD
+GOOGLE_CLIENT_ID
+GOOGLE_CLIENT_SECRET
+GOOGLE_REDIRECT_URI
 ```
 
 `RAKETEX_SECRET_KEY` should be a long random value. `RAKETEX_ADMIN_PASSWORD` replaces the local default password.
 
 If your Blob store is private, the app will upload images privately and serve them through Flask at `/blob/...`. Public Blob stores use direct public Blob URLs.
+
+For Google sign-in, create OAuth credentials in Google Cloud Console and add this authorized redirect URI:
+
+```text
+https://your-site.vercel.app/auth/google/callback
+```
 
 Vercel recognizes `app.py` as a Flask entrypoint, so no static `index.html` is needed.
 

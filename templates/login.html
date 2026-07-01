@@ -1,11 +1,17 @@
 {% extends "base.html" %}
 
-{% block title %}Admin Login - RAKETEX{% endblock %}
+{% block title %}User Login - RAKETEX{% endblock %}
 
 {% block body %}
   <div class="login-wrap">
     <section class="panel login-panel">
-      <h2>Admin Login</h2>
+      <h2>User Login</h2>
+      {% if google_sign_in_enabled %}
+        <a class="btn primary" href="{{ url_for('google_login') }}">sign in with google</a>
+      {% else %}
+        <p class="muted">Google sign-in needs GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET.</p>
+      {% endif %}
+      <p class="muted">Admin credentials unlock admin rights.</p>
       <form method="post">
         <div class="field">
           <label for="username">username</label>
